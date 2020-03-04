@@ -37,7 +37,13 @@ jobs:
         uses: webbertakken/unity-test-runner@v1.3
         with:
           unityVersion: ${{ matrix.unityVersion }}
-
+      
+      # Export test results
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Test results for ${{ matrix.testMode }}
+          path: testResults
+          
       # Build
       - name: Build project
         uses: webbertakken/unity-builder@v0.10
