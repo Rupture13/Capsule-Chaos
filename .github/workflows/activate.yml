@@ -7,8 +7,8 @@ jobs:
     steps:
         # Request manual activation file
         - name: Unity - Request Activation File
-            uses: webbertakken/unity-request-manual-activation-file@v1.1
-            with:
+          uses: webbertakken/unity-request-manual-activation-file@v1.1
+          with:
                 unityVersion: 2019.3.3f1
         # Upload artifact (Unity_v2019.3.3f1)
         - name: Expose as artifact
