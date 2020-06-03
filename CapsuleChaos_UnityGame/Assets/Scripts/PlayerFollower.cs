@@ -7,9 +7,15 @@ public class PlayerFollower : MonoBehaviour
     [SerializeField]
     private Transform player = default;
 
-    // Update is called once per frame
+    private bool follow = true;
+
     void Update()
     {
-        this.transform.position = player.position;
+        if (follow) { this.transform.position = player.position; }
+    }
+
+    public void SetFollowing(bool value)
+    {
+        follow = value;
     }
 }
