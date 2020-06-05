@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using ScoreboardService.Models;
 
 namespace ScoreboardService.Controllers
@@ -14,10 +17,56 @@ namespace ScoreboardService.Controllers
     public class HighscoresController : ControllerBase
     {
         private readonly ScoreboardContext _context;
+        private ConnectionFactory factory;
+        private IConnection conn;
+        private IModel channel;
 
         public HighscoresController(ScoreboardContext context)
         {
             _context = context;
+
+            factory = new ConnectionFactory { HostName = "localhost" };
+            conn = factory.CreateConnection();
+            channel = conn.CreateModel();
+
+            channel.QueueDeclare(
+                queue: "AccountQueue",
+                durable: false,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null
+                );
+
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += async (model, eventArgs) =>
+            {
+                var body = eventArgs.Body;
+                var message = Encoding.UTF8.GetString(body.ToArray());
+
+                Console.WriteLine($"[MessageQueue] Received message '{message}'");
+
+                var messageParts = message.Split(":");
+
+                var result = 0;
+                if (messageParts[0] == "DELETE")
+                {
+                    result = await DeleteRecordsOfPlayerId(Int32.Parse(messageParts[1]));
+                }
+
+                Console.WriteLine($"[MessageQueue] Processed message '{message}' and deleted {result} records.");
+            };
+
+            channel.BasicConsume(queue: "AccountQueue", autoAck: true, consumer: consumer);
+        }
+
+        //Destructor
+        ~HighscoresController()
+        {
+            //Connection and Channels are meant to be long-lived
+            //So we don't open and close them for each operation
+
+            channel.Close();
+            conn.Close();
         }
 
         // GET: api/Highscores
@@ -117,6 +166,20 @@ namespace ScoreboardService.Controllers
         private bool IsHigherScore(Highscore newScore, Highscore oldScore)
         {
             return newScore.FinishedTime < oldScore.FinishedTime;
+        }
+
+        private async Task<int> DeleteRecordsOfPlayerId(int playerId)
+        {
+            var playerHighScores = await _context.Highscores.Where(h => h.PlayerId == playerId).ToListAsync();
+            
+            var deletedAmount = playerHighScores.Count;
+
+            if (deletedAmount == 0) { return 0; }
+
+            _context.Highscores.RemoveRange(playerHighScores);
+            await _context.SaveChangesAsync();
+
+            return deletedAmount;
         }
     }
 }
