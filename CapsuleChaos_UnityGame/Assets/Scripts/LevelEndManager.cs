@@ -14,19 +14,9 @@ public class LevelEndManager : MonoBehaviour
     private int levelId = 0;
 
     [SerializeField]
-    private string validationAPIbaseURL = "https://localhost";
+    private string APIGWbaseUrl = "https://localhost";
     [SerializeField]
-    private int validationAPIPort = 5002;
-
-    [SerializeField]
-    private string scoreboardAPIbaseURL = "https://localhost";
-    [SerializeField]
-    private int scoreboardAPIPort = 5003;
-
-    [SerializeField]
-    private string ghostAPIbaseURL = "https://localhost";
-    [SerializeField]
-    private int ghostAPIPort = 5004;
+    private int APIGWport = 5010;
 
     [SerializeField]
     private PlayerInfo playerInfo = default;
@@ -57,7 +47,7 @@ public class LevelEndManager : MonoBehaviour
 
         string validationJson = JsonUtility.ToJson(new ValidationData(levelId, playerScore.score, playerScore.GetTimeInteger()));
 
-        using (UnityWebRequest req = UnityWebRequest.Post($"{validationAPIbaseURL}:{validationAPIPort}/api/validate", ""))
+        using (UnityWebRequest req = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/validation/validate", ""))
         {
             req.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(validationJson));
             req.SetRequestHeader("Content-Type", "application/json");
@@ -93,7 +83,7 @@ public class LevelEndManager : MonoBehaviour
             playerScore.GetTimeInteger()
             ));
 
-        using (UnityWebRequest req2 = UnityWebRequest.Post($"{scoreboardAPIbaseURL}:{scoreboardAPIPort}/api/highscores", ""))
+        using (UnityWebRequest req2 = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/scoreboard/highscores", ""))
         {
             req2.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(highscoreJson));
             req2.SetRequestHeader("Content-Type", "application/json");

@@ -26,9 +26,9 @@ class Home extends Component {
 
 	async componentDidMount(): Promise<void> {
 		let component = this;
-		let adviceAPI = new ApiCaller("5003");
+		let adviceAPI = new ApiCaller("5010");
 
-		adviceAPI.get('highscores').then(function (response) {
+		adviceAPI.get('scoreboard/highscores').then(function (response) {
 			component.setState({ highScores: response.data });
 		});
 	}
