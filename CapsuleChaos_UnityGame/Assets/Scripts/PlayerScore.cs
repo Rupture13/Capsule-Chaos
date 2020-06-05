@@ -12,12 +12,14 @@ public class PlayerScore : MonoBehaviour
     [SerializeField]
     private UnityFloatEvent timeEvent = default;
 
-    private int score;
-    private float timer;
+    public int score;
+    public float timer;
 
+    private bool pause;
 
     void Start()
     {
+        pause = false;
         score = 0;
         timer = 0f;
         timeEvent.Invoke(timer);
@@ -25,8 +27,11 @@ public class PlayerScore : MonoBehaviour
 
     void Update()
     {
-        timer += Time.deltaTime;
-        timeEvent.Invoke(timer);
+        if (!pause)
+        {
+            timer += Time.deltaTime;
+            timeEvent.Invoke(timer);
+        }
     }
 
     public void AddScore(int value)
@@ -34,6 +39,16 @@ public class PlayerScore : MonoBehaviour
         score += value;
         scoreEvent.Invoke(score);
         scoreValueEvent.Invoke(value);
+    }
+
+    public int GetTimeInteger()
+    {
+        return Mathf.FloorToInt(timer * 100);
+    }
+
+    public void StopTimer()
+    {
+        pause = true;
     }
 
     [System.Serializable]

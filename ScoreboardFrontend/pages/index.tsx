@@ -14,7 +14,7 @@ class Home extends Component {
 		let newContents = [];
 		let highScores = this.state.highScores as Highscore[]
 		highScores.forEach(highScore => {
-			newContents.push(<p>{highScore.playername} haalde {highScore.calculatedTotal} punten.</p>);
+			newContents.push(<p>{highScore.playername} completed level {highScore.levelId} in {highScore.calculatedTotal}.</p>);
 			newContents.push(<br />);
 		});
 
@@ -26,7 +26,7 @@ class Home extends Component {
 
 	async componentDidMount(): Promise<void> {
 		let component = this;
-		let adviceAPI = new ApiCaller("5001");
+		let adviceAPI = new ApiCaller("5003");
 
 		adviceAPI.get('highscores').then(function (response) {
 			component.setState({ highScores: response.data });

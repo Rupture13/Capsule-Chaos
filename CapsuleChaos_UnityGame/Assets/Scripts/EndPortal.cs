@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class EndPortal : MonoBehaviour
@@ -10,6 +11,9 @@ public class EndPortal : MonoBehaviour
     
     [SerializeField]
     private GameObject[] toActivateOnOpen = default;
+
+    [SerializeField]
+    private UnityStringEvent onLevelFinish = default;
 
     public void AddScore(float value)
     {
@@ -25,16 +29,13 @@ public class EndPortal : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.gameObject.GetComponent<PlayerController>()) { return; }
+        var playerScore = other.gameObject.GetComponent<PlayerScore>();
+        if (!playerScore) { return; }
 
         if (requiredScore == 0)
         {
-            Physics.gravity = new Vector3(0, -9.81f, 0);
-            SceneManager.LoadScene(0);
-        }
-        else
-        {
-            Debug.Log("Get more points, plz");
+            playerScore.StopTimer();
+            onLevelFinish.Invoke(Utils.FormatTime(playerScore.timer));
         }
     }
 }

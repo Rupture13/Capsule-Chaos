@@ -5,7 +5,7 @@ using UnityEngine;
 public class MainMenuRoller : MonoBehaviour
 {
     [SerializeField]
-    private float deathHeight;
+    private float deathHeight = default;
     private Vector3 startPos;
     private Rigidbody rb;
 

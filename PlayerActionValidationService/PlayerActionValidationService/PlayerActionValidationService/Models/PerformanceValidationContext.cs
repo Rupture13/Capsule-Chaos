@@ -11,11 +11,6 @@ namespace PlayerActionValidationService.Models
         public PerformanceValidationContext(DbContextOptions<PerformanceValidationContext> options)
             : base(options)
         {
-            //TODO: Remove this method call and the method itself after testing
-            //Parameter:
-            //1 for seeding only with AdviceContents
-            //2 for seeding only with AdviceContents and Advicese
-            //3 for seeding with all models
             SeedContextOnStartup();
         }
 
@@ -32,14 +27,14 @@ namespace PlayerActionValidationService.Models
             {
                 LevelId = 1,
                 MaximumScore = 10,
-                MinimumTime = 30
+                MinimumTime = 2000
             };
 
             var newPerformanceValidation2 = new PerformanceValidation
             {
                 LevelId = 2,
                 MaximumScore = 12,
-                MinimumTime = 45
+                MinimumTime = 4500
             };
 
             this.PerformanceValidations.Add(newPerformanceValidation1);

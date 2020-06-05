@@ -150,6 +150,14 @@ public class PlayerController : MonoBehaviour
         allowSepuku = true;
     }
 
+    public void FlyLocalUp()
+    {
+        dead = true;
+        Vector3 underPosition = gravityDirection.position * 100;
+        rb.AddExplosionForce(1000f, underPosition, 10000f);
+        rb.useGravity = false;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         ++collisionAmount;

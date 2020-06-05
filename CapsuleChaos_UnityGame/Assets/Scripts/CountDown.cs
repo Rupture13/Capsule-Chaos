@@ -7,9 +7,9 @@ using UnityEngine.Events;
 public class CountDown : MonoBehaviour
 {
     [SerializeField]
-    private TextMeshProUGUI text;
+    private TextMeshProUGUI text = default;
     [SerializeField]
-    private UnityEvent startGame;
+    private UnityEvent startGame = default;
 
     private int countDown = 3;
 

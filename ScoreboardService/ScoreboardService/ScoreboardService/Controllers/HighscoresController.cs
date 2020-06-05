@@ -27,50 +27,11 @@ namespace ScoreboardService.Controllers
             return await _context.Highscores.ToListAsync();
         }
 
-        // GET: api/Highscores/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Highscore>> GetHighscore(int id)
+        // GET: api/Highscores/Level/1
+        [HttpGet("Level/{levelId}")]
+        public async Task<ActionResult<IEnumerable<Highscore>>> GetHighscoresOfLevel(int levelId)
         {
-            var highscore = await _context.Highscores.FindAsync(id);
-
-            if (highscore == null)
-            {
-                return NotFound();
-            }
-
-            return highscore;
-        }
-
-        // PUT: api/Highscores/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutHighscore(int id, Highscore highscore)
-        {
-            if (id != highscore.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(highscore).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!HighscoreExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await _context.Highscores.Where(highscore => highscore.LevelId == levelId).ToListAsync();
         }
 
         // POST: api/Highscores
@@ -79,10 +40,50 @@ namespace ScoreboardService.Controllers
         [HttpPost]
         public async Task<ActionResult<Highscore>> PostHighscore(Highscore highscore)
         {
-            _context.Highscores.Add(highscore);
-            await _context.SaveChangesAsync();
+            var oldHighScore = GetPlayerHighScoreForLevel(highscore.PlayerId, highscore.LevelId);
 
-            return CreatedAtAction("GetHighscore", new { id = highscore.Id }, highscore);
+            if (oldHighScore == null)
+            {
+                //There is no previous highscore for this player in this level, creating one
+
+                _context.Highscores.Add(highscore);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetHighscoresOfLevel", new { id = highscore.Id, levelId = highscore.LevelId }, highscore);       //201
+            }
+            else if (IsHigherScore(highscore, oldHighScore))
+            {
+                //There is a previous highscore, new highscore is higher and will overwrite old highscore
+                oldHighScore.CollectedScore = highscore.CollectedScore;
+                oldHighScore.FinishedTime = highscore.FinishedTime;
+                oldHighScore.CalculatedTotal = highscore.CalculatedTotal;
+
+                _context.Entry(oldHighScore).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!HighscoreExists(oldHighScore.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return Ok();            //200
+            }
+            else
+            {
+                //There is a previous highscore, new highscore is lower and nothing will happen
+
+                return NoContent();     //204
+            }
         }
 
         // DELETE: api/Highscores/5
@@ -104,6 +105,18 @@ namespace ScoreboardService.Controllers
         private bool HighscoreExists(int id)
         {
             return _context.Highscores.Any(e => e.Id == id);
+        }
+
+        private Highscore GetPlayerHighScoreForLevel(int playerId, int levelId)
+        {
+            return _context.Highscores
+                .Where(highscore => highscore.PlayerId == playerId && highscore.LevelId == levelId)
+                .FirstOrDefault();
+        }
+
+        private bool IsHigherScore(Highscore newScore, Highscore oldScore)
+        {
+            return newScore.FinishedTime < oldScore.FinishedTime;
         }
     }
 }

@@ -10,9 +10,6 @@ public class TimerUI : MonoBehaviour
 
     public void SetTime(float time)
     {
-        int minutes = Mathf.FloorToInt(time / 60);
-        int seconds = Mathf.FloorToInt(time % 60);
-        int milliseconds = Mathf.FloorToInt((time - Mathf.FloorToInt(time)) * 100);
-        textUI.text = $"{minutes:00}:{seconds:00}:{milliseconds:00}";
+        textUI.text = Utils.FormatTime(time);
     }
 }

@@ -9,7 +9,7 @@ using PlayerActionValidationService.Models;
 
 namespace PlayerActionValidationService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/validate")]
     [ApiController]
     public class ValidationsController : ControllerBase
     {
@@ -20,90 +20,39 @@ namespace PlayerActionValidationService.Controllers
             _context = context;
         }
 
-        // GET: api/Validations
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PerformanceValidation>>> GetPerformanceValidations()
-        {
-            return await _context.PerformanceValidations.ToListAsync();
-        }
-
-        // GET: api/Validations/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PerformanceValidation>> GetPerformanceValidation(int id)
-        {
-            var performanceValidation = await _context.PerformanceValidations.FindAsync(id);
-
-            if (performanceValidation == null)
-            {
-                return NotFound();
-            }
-
-            return performanceValidation;
-        }
-
-        // PUT: api/Validations/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPerformanceValidation(int id, PerformanceValidation performanceValidation)
-        {
-            if (id != performanceValidation.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(performanceValidation).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PerformanceValidationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Validations
+        // POST: api/validate
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<PerformanceValidation>> PostPerformanceValidation(PerformanceValidation performanceValidation)
+        public async Task<ActionResult> PostPerformanceValidation(PerformanceValidation performance)
         {
-            _context.PerformanceValidations.Add(performanceValidation);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPerformanceValidation", new { id = performanceValidation.Id }, performanceValidation);
-        }
-
-        // DELETE: api/Validations/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<PerformanceValidation>> DeletePerformanceValidation(int id)
-        {
-            var performanceValidation = await _context.PerformanceValidations.FindAsync(id);
-            if (performanceValidation == null)
+            if (!PerformanceValidationExists(performance.LevelId))
             {
                 return NotFound();
             }
 
-            _context.PerformanceValidations.Remove(performanceValidation);
-            await _context.SaveChangesAsync();
+            var validation = await _context.PerformanceValidations.FirstOrDefaultAsync(p => p.LevelId == performance.LevelId);
 
-            return performanceValidation;
+            if (PerformanceMatchesValidation(performance, validation))
+            {
+                return Ok();
+            }
+            else
+            {
+                return Conflict();
+            }
         }
 
-        private bool PerformanceValidationExists(int id)
+        private bool PerformanceValidationExists(int levelId)
         {
-            return _context.PerformanceValidations.Any(e => e.Id == id);
+            return _context.PerformanceValidations.Any(e => e.LevelId == levelId);
+        }
+
+        private bool PerformanceMatchesValidation(PerformanceValidation performance, PerformanceValidation validation)
+        {
+            return (performance.LevelId == validation.LevelId 
+                && performance.MaximumScore == validation.MaximumScore 
+                && performance.MinimumTime >= validation.MinimumTime);
         }
     }
 }
