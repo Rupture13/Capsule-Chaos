@@ -6516,6 +6516,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerInfo: {fileID: 11400000, guid: a0abb381f30cdab4d9e23537d5979dce, type: 2}
+  levelInfo: {fileID: 11400000, guid: 3f876e1eb199e80489190648b8a061e9, type: 2}
   ghostInfo: {fileID: 11400000, guid: befd3ae2bd549894899f9d5d657d8c03, type: 2}
   mainMenuCamera: {fileID: 1973048887}
 --- !u!4 &1329734172
@@ -7806,8 +7807,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b074bc6f4aac25748ac22b868c8e52ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiBaseUrl: https://localhost
-  apiPort: 5001
+  APIGWbaseUrl: https://localhost
+  APIGWport: 5010
   playerInfo: {fileID: 11400000, guid: a0abb381f30cdab4d9e23537d5979dce, type: 2}
   inputUsername: {fileID: 1827831047}
   inputPassword: {fileID: 1328976958}

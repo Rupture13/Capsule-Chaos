@@ -29,11 +29,13 @@ namespace PlayerPerformanceService.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/PlayerPerformances/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PlayerPerformance>> GetPlayerPerformance(int id)
+        // GET: api/PlayerPerformances/Level/1/Player/2
+        [HttpGet("Level/{levelId}/Player{playerId}")]
+        public async Task<ActionResult<PlayerPerformance>> GetPlayerPerformance(int levelId, int playerId)
         {
-            var playerPerformance = await _context.PlayerPerformances.FindAsync(id);
+            var playerPerformance = await _context.PlayerPerformances
+                                                    .Where(p => (p.LevelId == levelId && p.PlayerId == playerId))
+                                                    .FirstOrDefaultAsync();
 
             if (playerPerformance == null)
             {
@@ -43,48 +45,48 @@ namespace PlayerPerformanceService.Controllers
             return playerPerformance;
         }
 
-        // PUT: api/PlayerPerformances/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPlayerPerformance(int id, PlayerPerformance playerPerformance)
-        {
-            if (id != playerPerformance.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(playerPerformance).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PlayerPerformanceExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
         // POST: api/PlayerPerformances
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         public async Task<ActionResult<PlayerPerformance>> PostPlayerPerformance(PlayerPerformance playerPerformance)
         {
-            _context.PlayerPerformances.Add(playerPerformance);
-            await _context.SaveChangesAsync();
+            var oldPerformance = GetPlayerPerformanceFromLevel(playerPerformance.PlayerId, playerPerformance.LevelId);
 
-            return CreatedAtAction("GetPlayerPerformance", new { id = playerPerformance.Id }, playerPerformance);
+            if (oldPerformance == null)
+            {
+                //There is no previous performance for this player in this level, creating one
+
+                _context.PlayerPerformances.Add(playerPerformance);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetPlayerPerformance", new { levelId = playerPerformance.LevelId, playerId = playerPerformance.PlayerId }, playerPerformance);       //201
+            }
+            else
+            {
+                //There is a previous performance, new performance will overwrite old performance
+                oldPerformance.Snapshots = playerPerformance.Snapshots;
+
+                _context.Entry(oldPerformance).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PlayerPerformanceExists(oldPerformance.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return Ok();            //200
+            }
         }
 
         // DELETE: api/PlayerPerformances/5
@@ -106,6 +108,13 @@ namespace PlayerPerformanceService.Controllers
         private bool PlayerPerformanceExists(int id)
         {
             return _context.PlayerPerformances.Any(e => e.Id == id);
+        }
+
+        private PlayerPerformance GetPlayerPerformanceFromLevel(int playerId, int levelId)
+        {
+            return _context.PlayerPerformances
+                .Where(performance => performance.PlayerId == playerId && performance.LevelId == levelId)
+                .FirstOrDefault();
         }
     }
 }

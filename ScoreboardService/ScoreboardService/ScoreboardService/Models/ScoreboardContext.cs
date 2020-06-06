@@ -34,8 +34,8 @@ namespace ScoreboardService.Models
                 Playername = "Rupture13",
                 LevelId = 1,
                 CollectedScore = 10,
-                FinishedTime = 4500,
-                CalculatedTotal = 4500
+                FinishedTime = 2800,
+                CalculatedTotal = 2800
             };
             var highscore2 = new Highscore
             {
@@ -43,8 +43,8 @@ namespace ScoreboardService.Models
                 Playername = "Vasharnesh",
                 LevelId = 1,
                 CollectedScore = 10,
-                FinishedTime = 4000,
-                CalculatedTotal = 4000
+                FinishedTime = 2800,
+                CalculatedTotal = 2800
             };
 
             this.Highscores.Add(highscore1);

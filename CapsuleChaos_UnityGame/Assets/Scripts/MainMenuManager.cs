@@ -8,12 +8,12 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField]
     private PlayerInfo playerInfo = default;
     [SerializeField]
+    private LevelInfo levelInfo = default;
+    [SerializeField]
     private GhostInfo ghostInfo = default;
 
     [SerializeField]
     private Animator mainMenuCamera = default;
-
-    private int currentLevelId = 0;
 
     private void Start()
     {
@@ -30,12 +30,12 @@ public class MainMenuManager : MonoBehaviour
 
     public void SetLevelId(int levelId)
     {
-        currentLevelId = levelId;
+        levelInfo.LevelId = levelId;
     }
 
     public void StartLevel()
     {
-        SceneManager.LoadScene(currentLevelId);
+        SceneManager.LoadScene(levelInfo.LevelId);
     }
 
     private void OnApplicationQuit()

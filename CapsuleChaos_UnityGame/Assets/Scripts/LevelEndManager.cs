@@ -9,9 +9,10 @@ using UnityEngine.SceneManagement;
 public class LevelEndManager : MonoBehaviour
 {
     [SerializeField]
-    private PlayerScore playerScore = default;
+    private LevelInfo levelInfo = default;
+
     [SerializeField]
-    private int levelId = 0;
+    private PlayerScore playerScore = default;
 
     [SerializeField]
     private string APIGWbaseUrl = "https://localhost";
@@ -42,10 +43,15 @@ public class LevelEndManager : MonoBehaviour
 
     private IEnumerator SaveScoreToBackend()
     {
+        //TODO delete
+        string ghostJson2 = JsonUtility.ToJson(ghostInfo.PlayerPerformance);
+        Debug.Log(ghostJson2);
+
         bool hasFailed = false;
         string successMessage = "Score saved successfully!";
 
-        string validationJson = JsonUtility.ToJson(new ValidationData(levelId, playerScore.score, playerScore.GetTimeInteger()));
+        // -------------- Step 1: Check cheating --------------
+        string validationJson = JsonUtility.ToJson(new ValidationData(levelInfo.LevelId, playerScore.score, playerScore.GetTimeInteger()));
 
         using (UnityWebRequest req = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/validation/validate", ""))
         {
@@ -67,18 +73,24 @@ public class LevelEndManager : MonoBehaviour
                 }
                 else if (req.responseCode == (long)System.Net.HttpStatusCode.NotFound)
                 {
-                    onFail.Invoke($"Score could not be saved because level {levelId} could not be found");
+                    onFail.Invoke($"Score could not be saved because level {levelInfo.LevelId} could not be found");
                 }
                 hasFailed = true;
             }
         }
 
+        // Stop if cheating detected or the request failed in some other way
         if (hasFailed) { yield break; }
+
+
+        // -------------- Step 2: Post score --------------
+        bool newHighscore = false;
 
         string highscoreJson = JsonUtility.ToJson(new HighscoreData(
             playerInfo.Player.accountId, 
-            playerInfo.Player.username, 
-            levelId, playerScore.score, 
+            playerInfo.Player.username,
+            levelInfo.LevelId, 
+            playerScore.score, 
             playerScore.GetTimeInteger(), 
             playerScore.GetTimeInteger()
             ));
@@ -98,6 +110,7 @@ public class LevelEndManager : MonoBehaviour
             else if (req2.responseCode == (long)System.Net.HttpStatusCode.OK || req2.responseCode == (long)System.Net.HttpStatusCode.Created || req2.responseCode == 0)
             {
                 successMessage = "New highscore!\nSuccessfully saved";
+                newHighscore = true;
             }
             else if (req2.responseCode == (long)System.Net.HttpStatusCode.NoContent)
             {
@@ -110,6 +123,43 @@ public class LevelEndManager : MonoBehaviour
             }
         }
 
+        // Stop if request has failed in some way
+        if (hasFailed) { yield break; }
+
+        // -------------- Step 3.A: Stop on no new highscore --------------
+        if (!newHighscore)
+        {
+            onSuccess.Invoke(successMessage);
+            yield break;
+        }
+
+        // -------------- Step 3.B: Post new ghost data on new highscore --------------
+        string ghostJson = JsonUtility.ToJson(ghostInfo.PlayerPerformance);
+
+        using (UnityWebRequest req3 = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/ghost/playerperformances", ""))
+        {
+            req3.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(ghostJson));
+            req3.SetRequestHeader("Content-Type", "application/json");
+
+            yield return req3.SendWebRequest();
+            while (!req3.isDone) { yield return null; }
+            if (req3.isNetworkError)
+            {
+                onFail.Invoke("Score could not be saved due to a connection issue");
+                hasFailed = true;
+            }
+            else if (req3.responseCode == (long)System.Net.HttpStatusCode.OK || req3.responseCode == (long)System.Net.HttpStatusCode.Created || req3.responseCode == 0)
+            {
+                hasFailed = false;
+            }
+            else
+            {
+                onFail.Invoke($"Score could not be saved due to an unknown error ({req3.responseCode})");
+                hasFailed = true;
+            }
+        }
+
+        // Stop if request has failed in some way
         if (hasFailed) { yield break; }
 
         onSuccess.Invoke(successMessage);
