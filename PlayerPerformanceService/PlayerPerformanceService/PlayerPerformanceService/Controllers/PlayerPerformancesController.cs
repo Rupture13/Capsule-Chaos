@@ -34,6 +34,7 @@ namespace PlayerPerformanceService.Controllers
         public async Task<ActionResult<PlayerPerformance>> GetPlayerPerformance(int levelId, int playerId)
         {
             var playerPerformance = await _context.PlayerPerformances
+                                                    .Include(p => p.Snapshots)
                                                     .Where(p => (p.LevelId == levelId && p.PlayerId == playerId))
                                                     .FirstOrDefaultAsync();
 

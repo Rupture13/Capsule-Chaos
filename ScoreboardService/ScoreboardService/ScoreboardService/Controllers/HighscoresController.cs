@@ -170,14 +170,21 @@ namespace ScoreboardService.Controllers
 
         private async Task<int> DeleteRecordsOfPlayerId(int playerId)
         {
-            var playerHighScores = await _context.Highscores.Where(h => h.PlayerId == playerId).ToListAsync();
-            
-            var deletedAmount = playerHighScores.Count;
+            var deletedAmount = 0;
 
-            if (deletedAmount == 0) { return 0; }
+            var optionsBuilder = new DbContextOptionsBuilder<ScoreboardContext>();
+            optionsBuilder.UseInMemoryDatabase("HighscoreList");
+            using (var tempContext = new ScoreboardContext(optionsBuilder.Options))
+            {
+                var playerHighScores = await tempContext.Highscores.Where(h => h.PlayerId == playerId).ToListAsync();
 
-            _context.Highscores.RemoveRange(playerHighScores);
-            await _context.SaveChangesAsync();
+                deletedAmount = playerHighScores.Count;
+
+                if (deletedAmount == 0) { return 0; }
+
+                tempContext.Highscores.RemoveRange(playerHighScores);
+                await tempContext.SaveChangesAsync();
+            }
 
             return deletedAmount;
         }

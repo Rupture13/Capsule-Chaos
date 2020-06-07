@@ -23,7 +23,7 @@ namespace ScoreboardService.Models
 
         private void SeedContextOnStartup()
         {
-            if (this.Highscores.Find(1) != null)
+            if (this.Highscores.Count() > 0)
             {
                 return;
             }
