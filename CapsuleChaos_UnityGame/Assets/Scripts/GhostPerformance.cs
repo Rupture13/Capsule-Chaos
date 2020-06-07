@@ -26,6 +26,7 @@ public class GhostPerformance : MonoBehaviour
         {
             //Not enough points, end ghost
             GameObject.Destroy(this.gameObject);
+            return;
         }
 
         GetComponent<MeshRenderer>().enabled = true;
