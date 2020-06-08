@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlayerPerformanceService.Models;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 namespace PlayerPerformanceService.Controllers
 {
@@ -13,11 +16,75 @@ namespace PlayerPerformanceService.Controllers
     [ApiController]
     public class PlayerPerformancesController : ControllerBase
     {
+        private const string _username = "guest";
+        private const string _password = "guest";
+        private const string _hostname = "localhost";
+        private const string _queueName = "GhostQueue";
+
         private readonly PlayerPerformanceContext _context;
+
+        private ConnectionFactory factory;
+        private IConnection conn;
+        private IModel channel;
 
         public PlayerPerformancesController(PlayerPerformanceContext context)
         {
             _context = context;
+
+            factory = new ConnectionFactory
+            {
+                UserName = _username,
+                Password = _password,
+                HostName = _hostname
+            };
+            conn = factory.CreateConnection();
+            channel = conn.CreateModel();
+
+            channel.BasicQos(0, 1, false);
+
+            channel.QueueDeclare(
+                queue: _queueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null
+                );
+
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += async (model, eventArgs) =>
+            {
+                var body = eventArgs.Body;
+                var message = Encoding.UTF8.GetString(body.ToArray());
+
+                Console.WriteLine($"[MessageQueue] Received message '{message}'");
+
+                var messageParts = message.Split(":");
+
+                var result = 0;
+                if (messageParts[0] == "DELETE")
+                {
+                    result = await DeleteRecordsOfPlayerId(Int32.Parse(messageParts[1]));
+                    Console.WriteLine($"[MessageQueue] Processed message '{message}' and deleted {result} records.");
+                }
+                else if (messageParts[0] == "UPDATE")
+                {
+                    Console.WriteLine($"[MessageQueue] Message is not relevant for this service.");
+                }
+                
+                channel.BasicAck(eventArgs.DeliveryTag, false);
+            };
+
+            channel.BasicConsume(queue: _queueName, autoAck: false, consumer: consumer);
+        }
+
+        //Destructor
+        ~PlayerPerformancesController()
+        {
+            //Connection and Channels are meant to be long-lived
+            //So we don't open and close them for each operation
+
+            channel.Close();
+            conn.Close();
         }
 
         // GET: api/PlayerPerformances
@@ -116,6 +183,36 @@ namespace PlayerPerformanceService.Controllers
             return _context.PlayerPerformances
                 .Where(performance => performance.PlayerId == playerId && performance.LevelId == levelId)
                 .FirstOrDefault();
+        }
+
+        private async Task<int> DeleteRecordsOfPlayerId(int playerId)
+        {
+            var deletedAmount = 0;
+
+            var optionsBuilder = new DbContextOptionsBuilder<PlayerPerformanceContext>();
+            optionsBuilder.UseInMemoryDatabase("PlayerPerformanceList");
+            using (var tempContext = new PlayerPerformanceContext(optionsBuilder.Options))
+            {
+                var playerPerformances = await tempContext.PlayerPerformances
+                    .Where(p => p.PlayerId == playerId)
+                    .Include(p => p.Snapshots)
+                    .ToListAsync();
+
+                deletedAmount = playerPerformances.Count;
+
+                if (deletedAmount == 0) { return 0; }
+
+                foreach (var performance in playerPerformances)
+                {
+                    tempContext.PerformanceSnapshots.RemoveRange(performance.Snapshots);
+                    performance.Snapshots = null;
+                }
+
+                tempContext.PlayerPerformances.RemoveRange(playerPerformances);
+                await tempContext.SaveChangesAsync();
+            }
+
+            return deletedAmount;
         }
     }
 }

@@ -16,7 +16,13 @@ namespace ScoreboardService.Controllers
     [ApiController]
     public class HighscoresController : ControllerBase
     {
+        private const string _username = "guest";
+        private const string _password = "guest";
+        private const string _hostname = "localhost";
+        private const string _queueName = "ScoreboardQueue";
+
         private readonly ScoreboardContext _context;
+        
         private ConnectionFactory factory;
         private IConnection conn;
         private IModel channel;
@@ -25,13 +31,18 @@ namespace ScoreboardService.Controllers
         {
             _context = context;
 
-            factory = new ConnectionFactory { HostName = "localhost" };
+            factory = new ConnectionFactory { 
+                UserName = _username,
+                Password = _password,
+                HostName = _hostname };
             conn = factory.CreateConnection();
             channel = conn.CreateModel();
 
+            channel.BasicQos(0, 1, false);
+
             channel.QueueDeclare(
-                queue: "AccountQueue",
-                durable: false,
+                queue: _queueName,
+                durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null
@@ -48,15 +59,21 @@ namespace ScoreboardService.Controllers
                 var messageParts = message.Split(":");
 
                 var result = 0;
-                if (messageParts[0] == "DELETE")
+                if (messageParts[0] == "UPDATE")
+                {
+                    result = await UpdateRecordsOfPlayerId(Int32.Parse(messageParts[1]), messageParts[2]);
+                    Console.WriteLine($"[MessageQueue] Processed message '{message}' and updated {result} records.");
+                }
+                else if (messageParts[0] == "DELETE")
                 {
                     result = await DeleteRecordsOfPlayerId(Int32.Parse(messageParts[1]));
+                    Console.WriteLine($"[MessageQueue] Processed message '{message}' and deleted {result} records.");
                 }
 
-                Console.WriteLine($"[MessageQueue] Processed message '{message}' and deleted {result} records.");
+                channel.BasicAck(eventArgs.DeliveryTag, false);
             };
 
-            channel.BasicConsume(queue: "AccountQueue", autoAck: true, consumer: consumer);
+            channel.BasicConsume(queue: _queueName, autoAck: false, consumer: consumer);
         }
 
         //Destructor
@@ -187,6 +204,34 @@ namespace ScoreboardService.Controllers
             }
 
             return deletedAmount;
+        }
+
+        private async Task<int> UpdateRecordsOfPlayerId(int playerId, string newUsername)
+        {
+            var updatedRecords = 0;
+
+            var optionsBuilder = new DbContextOptionsBuilder<ScoreboardContext>();
+            optionsBuilder.UseInMemoryDatabase("HighscoreList");
+            using (var tempContext = new ScoreboardContext(optionsBuilder.Options))
+            {
+                var playerHighScores = await tempContext.Highscores
+                    .Where(h => h.PlayerId == playerId)
+                    .ToListAsync();
+
+                updatedRecords = playerHighScores.Count;
+
+                if (updatedRecords == 0) { return 0; }
+
+                foreach (var highScore in playerHighScores)
+                {
+                    highScore.Playername = newUsername;
+                    tempContext.Entry(highScore).State = EntityState.Modified;
+                }
+
+                await tempContext.SaveChangesAsync();
+            }
+
+            return updatedRecords;
         }
     }
 }
