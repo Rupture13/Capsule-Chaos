@@ -29,7 +29,7 @@ jobs:
             gcloud container clusters  get-credentials ${{ secrets.GCLOUD_CLUSTER }} --zone ${{ secrets.GCLOUD_ZONE }}
             
       - name: Push image to Google Cloud Container Registry
-        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:$GITHUB_SHA"
+        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:latest"
      
      
       - name: Set up Kustomize
@@ -38,7 +38,7 @@ jobs:
           chmod u+x ./kustomize
       - name: Deploy 
         run: |-
-          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:$GITHUB_SHA
+          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:latest
           ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/capsulechaosfrontend
           kubectl get services -o wide
