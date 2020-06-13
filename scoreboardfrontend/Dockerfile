@@ -4,7 +4,7 @@ FROM node:10
 WORKDIR ./scoreboardfrontend
 
 # Installing dependencies
-COPY package*.json ./scoreboardfrontend
+COPY ./scoreboardfrontend/package*.json ./
 RUN npm install
 
 # Copying source files
