@@ -30,26 +30,43 @@
       "UpstreamPathTemplate": "/api/validation/{everything}",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET", "DELETE" ]
       //      "AuthenticationOptions": {
-      //        "AuthenticationProviderKey": "TestKey",
+      //        "AuthenticationProviderKey": "Auth0Key_CapsuleChaos",
       //        "AllowedScopes": [ "adviceAPI" ]
       //      }
     },
     {
-      //ScoreboardService
+      //ScoreboardService POST/PUT/DELETE
       "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5007
+          "Port": 5003
         }
       ],
-      "UpstreamPathTemplate": "/api/scoreboard/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "GET", "DELETE" ]
+      "UpstreamPathTemplate": "/api/highscores/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ]
       //      "AuthenticationOptions": {
       //        "AuthenticationProviderKey": "TestKey",
       //        "AllowedScopes": [ "adviceAPI" ]
       //      }
+    },
+    {
+      //ScoreboardService GET
+      "DownstreamPathTemplate": "/api/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/scoreboard/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0Key_CapsuleChaos",
+        "AllowedScopes": []
+      }
     },
     {
       //PlayerPerformanceService

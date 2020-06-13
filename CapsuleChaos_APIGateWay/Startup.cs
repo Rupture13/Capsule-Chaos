@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,15 +24,17 @@ namespace APIGW
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            var authenticationProviderKey = "Auth0Key_CapsuleChaos";
 
-            //s.AddAuthentication()
-            //    .AddJwtBearer("TestKey" ,options =>
-            //    {
-            //        options.Authority = "https://localhost:666";
-            //        options.RequireHttpsMetadata = false;
-
-            //        options.Audience = "APIGW";
-            //    });
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(authenticationProviderKey, x =>
+            {
+                x.Authority = "https://capsule-chaos.auth0.com/";
+                x.Audience = "g32Xq8NqrtSBAUZW2Xf5qQVn83JhvV2m";
+            });
 
             services.AddCors(options =>
             {
@@ -66,8 +69,8 @@ namespace APIGW
 
             app.UseRouting();
             
-            //app.UseAuthentication();
-            //app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
