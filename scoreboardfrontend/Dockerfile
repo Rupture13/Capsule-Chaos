@@ -1,7 +1,7 @@
 FROM node:10
 
 # Setting working directory. All the path will be relative to WORKDIR
-WORKDIR /usr/src/app
+WORKDIR .
 
 # Installing dependencies
 COPY package*.json ./
