@@ -7,6 +7,9 @@ WORKDIR .
 # Specific package and package-lock
 COPY package.json ./
 COPY package-lock.json ./
+
+ENV CI=true
+
 RUN npm install
 
 # Copying source files
