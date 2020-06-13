@@ -4,6 +4,7 @@ FROM node:10
 WORKDIR .
 
 # Installing dependencies
+# Specific package and package-lock
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm install

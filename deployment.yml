@@ -1,0 +1,26 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: capsulechaosfrontend
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: capsulechaosfrontend
+    spec:
+      containers:
+      - name: capsulechaosfrontend
+        image: eu.gcr.io/capsulechaos/capsulechaosfrontend
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 100m              
