@@ -4,7 +4,7 @@ FROM node:10
 WORKDIR .
 
 # Installing dependencies
-COPY package*.json .
+COPY package*.json ./
 RUN npm install
 
 # Copying source files
