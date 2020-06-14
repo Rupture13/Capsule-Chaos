@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
@@ -15,6 +16,9 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField]
     private Animator mainMenuCamera = default;
 
+    [SerializeField]
+    private UnityEvent alreadyLoggedIn = default;
+
     private void Start()
     {
         //Reset gravity for main menu physics simulation
@@ -25,6 +29,7 @@ public class MainMenuManager : MonoBehaviour
         {
             Debug.Log("Player already logged in!");
             mainMenuCamera.Play("MainMenuCameraInstantLevelSelect");
+            alreadyLoggedIn.Invoke();
         }
     }
 

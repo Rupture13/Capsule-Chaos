@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PlayerInfo
   m_EditorClassIdentifier: 
   Player:
-    accountId: 1
+    accountId: -1
     email: 
-    username: Rupture13
+    username: 

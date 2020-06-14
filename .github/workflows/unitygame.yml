@@ -1,7 +1,9 @@
 name: Unity Game Build
 
 on:
-  push: { branches: [que] }
+  push:
+    branches:
+      - 'unitygamedeploy'
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}

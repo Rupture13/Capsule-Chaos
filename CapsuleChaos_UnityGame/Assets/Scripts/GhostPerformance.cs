@@ -6,7 +6,7 @@ using UnityEngine.Events;
 public class GhostPerformance : MonoBehaviour
 {
     [SerializeField]
-    private GhostInfo ghostInfo;
+    private GhostInfo ghostInfo = default;
     private List<PerformanceSnapshot> ghostPoints;
 
     private float timer;
