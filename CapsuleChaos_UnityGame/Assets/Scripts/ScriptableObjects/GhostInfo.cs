@@ -13,12 +13,14 @@ public class GhostInfo : ScriptableObject
 public class PlayerPerformance
 {
     public int playerId;
+    public string playerName;
     public int levelId;
     public List<PerformanceSnapshot> snapshots;
 
-    public PlayerPerformance(int _playerId, int _levelId)
+    public PlayerPerformance(int _playerId, string _playerName,int _levelId)
     {
         playerId = _playerId;
+        playerName = _playerName;
         levelId = _levelId;
         snapshots = new List<PerformanceSnapshot>();
     }

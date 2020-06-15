@@ -51,8 +51,5 @@ public class PlayerScore : MonoBehaviour
         pause = true;
     }
 
-    [System.Serializable]
-    public class UnityFloatEvent : UnityEvent<float>
-    {
-    }
+    
 }

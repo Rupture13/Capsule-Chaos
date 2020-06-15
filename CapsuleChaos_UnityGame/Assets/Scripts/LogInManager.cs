@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class LogInManager : MonoBehaviour
 {
     [SerializeField]
-    private string APIGWbaseUrl = "https://localhost";
+    private string APIGWbaseUrl = "http://localhost";
     [SerializeField]
     private int APIGWport = 5010;
 

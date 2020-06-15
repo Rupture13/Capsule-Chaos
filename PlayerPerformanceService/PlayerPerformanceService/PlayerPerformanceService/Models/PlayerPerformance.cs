@@ -14,6 +14,9 @@ namespace PlayerPerformanceService.Models
         public int PlayerId { get; set; }
 
         [Required]
+        public string PlayerName { get; set; }
+
+        [Required]
         public int LevelId { get; set; }
 
         [Required]

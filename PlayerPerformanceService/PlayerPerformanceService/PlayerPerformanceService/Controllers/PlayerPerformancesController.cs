@@ -61,14 +61,15 @@ namespace PlayerPerformanceService.Controllers
                 var messageParts = message.Split(":");
 
                 var result = 0;
-                if (messageParts[0] == "DELETE")
+                if (messageParts[0] == "UPDATE")
+                {
+                    result = await UpdateRecordsOfPlayerId(Int32.Parse(messageParts[1]), messageParts[2]);
+                    Console.WriteLine($"[MessageQueue] Processed message '{message}' and updated {result} records.");
+                }
+                else if (messageParts[0] == "DELETE")
                 {
                     result = await DeleteRecordsOfPlayerId(Int32.Parse(messageParts[1]));
                     Console.WriteLine($"[MessageQueue] Processed message '{message}' and deleted {result} records.");
-                }
-                else if (messageParts[0] == "UPDATE")
-                {
-                    Console.WriteLine($"[MessageQueue] Message is not relevant for this service.");
                 }
                 
                 channel.BasicAck(eventArgs.DeliveryTag, false);
@@ -92,6 +93,17 @@ namespace PlayerPerformanceService.Controllers
         public async Task<ActionResult<IEnumerable<PlayerPerformance>>> GetPlayerPerformances()
         {
             return await _context.PlayerPerformances
+                .Include(p => p.Snapshots)
+                .ToListAsync();
+        }
+
+        // GET: api/PlayerPerformances/1
+        [HttpGet("{levelId}")]
+        public async Task<ActionResult<IEnumerable<PlayerPerformance>>> GetPlayerPerformancesOfLevel(int levelId)
+        {
+            return await _context.PlayerPerformances
+                .Where(p => p.LevelId == levelId)
+                .OrderByDescending(p => p.Snapshots.Count)
                 .Include(p => p.Snapshots)
                 .ToListAsync();
         }
@@ -213,6 +225,34 @@ namespace PlayerPerformanceService.Controllers
             }
 
             return deletedAmount;
+        }
+
+        private async Task<int> UpdateRecordsOfPlayerId(int playerId, string newUsername)
+        {
+            var updatedRecords = 0;
+
+            var optionsBuilder = new DbContextOptionsBuilder<PlayerPerformanceContext>();
+            optionsBuilder.UseInMemoryDatabase("PlayerPerformanceList");
+            using (var tempContext = new PlayerPerformanceContext(optionsBuilder.Options))
+            {
+                var playerPerformances = await tempContext.PlayerPerformances
+                    .Where(p => p.PlayerId == playerId)
+                    .ToListAsync();
+
+                updatedRecords = playerPerformances.Count;
+
+                if (updatedRecords == 0) { return 0; }
+
+                foreach (var performance in playerPerformances)
+                {
+                    performance.PlayerName = newUsername;
+                    tempContext.Entry(performance).State = EntityState.Modified;
+                }
+
+                await tempContext.SaveChangesAsync();
+            }
+
+            return updatedRecords;
         }
     }
 }

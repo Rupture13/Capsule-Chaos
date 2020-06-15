@@ -13,10 +13,6 @@ namespace PlayerPerformanceService.Models
             : base(options)
         {
             //TODO: Remove this method call and the method itself after testing
-            //Parameter:
-            //1 for seeding only with AdviceContents
-            //2 for seeding only with AdviceContents and Advicese
-            //3 for seeding with all models
             SeedContextOnStartup();
         }
 
@@ -1355,6 +1351,7 @@ namespace PlayerPerformanceService.Models
             var performance = new PlayerPerformance
             {
                 PlayerId = 1,
+                PlayerName = "Rupture13",
                 LevelId = 1
             };
             performance.Snapshots.Add(snapshot1);
@@ -1417,6 +1414,7 @@ namespace PlayerPerformanceService.Models
             var performance2 = new PlayerPerformance
             {
                 PlayerId = 2,
+                PlayerName = "Vasharnesh",
                 LevelId = 1
             };
             performance2.Snapshots.Add(snepshot1);

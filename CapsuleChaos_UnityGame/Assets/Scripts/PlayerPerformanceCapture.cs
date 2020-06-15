@@ -23,7 +23,7 @@ public class PlayerPerformanceCapture : MonoBehaviour
     void Start()
     {
         time = 0;
-        currentPerformance = new PlayerPerformance(playerInfo.Player.accountId, levelInfo.LevelId);
+        currentPerformance = new PlayerPerformance(playerInfo.Player.accountId, playerInfo.Player.username, levelInfo.LevelId);
 
         InvokeRepeating(nameof(CaptureSnapshot), time, captureInterval);
     }

@@ -15,7 +15,7 @@ public class LevelEndManager : MonoBehaviour
     private PlayerScore playerScore = default;
 
     [SerializeField]
-    private string APIGWbaseUrl = "https://localhost";
+    private string APIGWbaseUrl = "http://localhost";
     [SerializeField]
     private int APIGWport = 5010;
 
@@ -45,7 +45,7 @@ public class LevelEndManager : MonoBehaviour
     {
         //TODO delete
         string ghostJson2 = JsonUtility.ToJson(ghostInfo.PlayerPerformance);
-        Debug.Log(ghostJson2);
+        //Debug.Log(ghostJson2);
 
         bool hasFailed = false;
         string successMessage = "Score saved successfully!";
@@ -95,7 +95,7 @@ public class LevelEndManager : MonoBehaviour
             playerScore.GetTimeInteger()
             ));
 
-        using (UnityWebRequest req2 = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/scoreboard/highscores", ""))
+        using (UnityWebRequest req2 = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/highscores/highscores", ""))
         {
             req2.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(highscoreJson));
             req2.SetRequestHeader("Content-Type", "application/json");
@@ -201,8 +201,3 @@ public class LevelEndManager : MonoBehaviour
         }
     }
 }
-
-[System.Serializable]
-    public class UnityStringEvent : UnityEvent<string>
-    {
-    }

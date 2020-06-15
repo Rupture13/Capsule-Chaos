@@ -2501,7 +2501,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelInfo: {fileID: 11400000, guid: 3f876e1eb199e80489190648b8a061e9, type: 2}
   playerScore: {fileID: 287910366}
-  APIGWbaseUrl: https://localhost
+  APIGWbaseUrl: http://localhost
   APIGWport: 5010
   playerInfo: {fileID: 11400000, guid: a0abb381f30cdab4d9e23537d5979dce, type: 2}
   ghostInfo: {fileID: 11400000, guid: befd3ae2bd549894899f9d5d657d8c03, type: 2}
