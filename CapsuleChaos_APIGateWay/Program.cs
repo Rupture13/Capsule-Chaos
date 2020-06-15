@@ -35,6 +35,8 @@ namespace APIGW
                             true)
                         .AddJsonFile(Path.Combine("configuration", "configuration.json"), optional: false,
                             reloadOnChange: true)
+                        .AddJsonFile(Path.Combine("configuration", $"configuration_{hostingContext.HostingEnvironment.EnvironmentName}.json"), true, true)
+
                         .AddEnvironmentVariables();
                 })
                 .ConfigureLogging((hostingContext, logging) =>

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Ocelot.Provider.Kubernetes;
 
 namespace APIGW
 {
@@ -52,8 +53,8 @@ namespace APIGW
                 });
             });
 
-            services.AddOcelot();
-                //.AddKubernetes();
+
+            services.AddOcelot().AddKubernetes();
 
         }
 
