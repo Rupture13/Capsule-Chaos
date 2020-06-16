@@ -1,5 +1,48 @@
 name: Deploy ScoreboardService
+
 on:
   push:
     branches:
       - 'scoreboarddeploy'
+      
+jobs:
+  deploy:
+    name: Deploy job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v1
+
+      - name: Build Docker image
+        run: |-
+          docker build --tag "eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosscoreboardservice:latest" ./ScoreboardService/ScoreboardService/ScoreboardService
+      - name: Authenticate into Google Cloud Platform
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '286.0.0'
+          service_account_email: ${{ secrets.GCLOUD_EMAIL }}
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+          project_id: ${{ secrets.GCLOUD_PROJECT }}
+
+      - name: Configure Docker to use Google Cloud Platform
+        run: "gcloud auth configure-docker --quiet"
+      - run: |-
+            gcloud container clusters  get-credentials ${{ secrets.GCLOUD_CLUSTER }} --zone ${{ secrets.GCLOUD_ZONE }}
+            
+      - name: Push image to Google Cloud Container Registry
+        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosscoreboardservice:latest"
+     
+     
+      - name: Set up Kustomize
+        working-directory: ./ScoreboardService/ScoreboardService/ScoreboardService
+        run: |-
+          curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
+          chmod u+x ./kustomize
+          
+      - name: Deploy 
+        working-directory: ./ScoreboardService/ScoreboardService/ScoreboardService
+        run: |-
+          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosscoreboardservice=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosscoreboardservice:latest
+          ./kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment/capsulechaosscoreboardservice
+          kubectl get services -o wide
