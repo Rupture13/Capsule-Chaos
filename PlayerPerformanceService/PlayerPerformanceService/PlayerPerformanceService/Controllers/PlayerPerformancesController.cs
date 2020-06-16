@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PlayerPerformanceService.Models;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using ScoreboardService;
 
 namespace PlayerPerformanceService.Controllers
 {
@@ -18,24 +20,28 @@ namespace PlayerPerformanceService.Controllers
     {
         private const string _username = "guest";
         private const string _password = "guest";
-        private const string _hostname = "localhost";
         private const string _queueName = "GhostQueue";
 
-        private readonly PlayerPerformanceContext _context;
+        private readonly PlayerPerformanceContext context;
 
         private ConnectionFactory factory;
         private IConnection conn;
         private IModel channel;
 
-        public PlayerPerformancesController(PlayerPerformanceContext context)
+        private readonly IConfiguration configuration;
+
+        public PlayerPerformancesController(PlayerPerformanceContext _context, IConfiguration _configuration)
         {
-            _context = context;
+            context = _context;
+            configuration = _configuration;
+
+            var RabbitMQOption = configuration.GetSection(RabbitMQOptions.Position).Get<RabbitMQOptions>();
 
             factory = new ConnectionFactory
             {
                 UserName = _username,
                 Password = _password,
-                HostName = _hostname
+                HostName = RabbitMQOption.Connection
             };
             conn = factory.CreateConnection();
             channel = conn.CreateModel();
@@ -92,7 +98,7 @@ namespace PlayerPerformanceService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PlayerPerformance>>> GetPlayerPerformances()
         {
-            return await _context.PlayerPerformances
+            return await context.PlayerPerformances
                 .Include(p => p.Snapshots)
                 .ToListAsync();
         }
@@ -101,7 +107,7 @@ namespace PlayerPerformanceService.Controllers
         [HttpGet("{levelId}")]
         public async Task<ActionResult<IEnumerable<PlayerPerformance>>> GetPlayerPerformancesOfLevel(int levelId)
         {
-            return await _context.PlayerPerformances
+            return await context.PlayerPerformances
                 .Where(p => p.LevelId == levelId)
                 .OrderByDescending(p => p.Snapshots.Count)
                 .Include(p => p.Snapshots)
@@ -112,7 +118,7 @@ namespace PlayerPerformanceService.Controllers
         [HttpGet("Level/{levelId}/Player{playerId}")]
         public async Task<ActionResult<PlayerPerformance>> GetPlayerPerformance(int levelId, int playerId)
         {
-            var playerPerformance = await _context.PlayerPerformances
+            var playerPerformance = await context.PlayerPerformances
                                                     .Include(p => p.Snapshots)
                                                     .Where(p => (p.LevelId == levelId && p.PlayerId == playerId))
                                                     .FirstOrDefaultAsync();
@@ -137,8 +143,8 @@ namespace PlayerPerformanceService.Controllers
             {
                 //There is no previous performance for this player in this level, creating one
 
-                _context.PlayerPerformances.Add(playerPerformance);
-                await _context.SaveChangesAsync();
+                context.PlayerPerformances.Add(playerPerformance);
+                await context.SaveChangesAsync();
 
                 return CreatedAtAction("GetPlayerPerformance", new { levelId = playerPerformance.LevelId, playerId = playerPerformance.PlayerId }, playerPerformance);       //201
             }
@@ -147,11 +153,11 @@ namespace PlayerPerformanceService.Controllers
                 //There is a previous performance, new performance will overwrite old performance
                 oldPerformance.Snapshots = playerPerformance.Snapshots;
 
-                _context.Entry(oldPerformance).State = EntityState.Modified;
+                context.Entry(oldPerformance).State = EntityState.Modified;
 
                 try
                 {
-                    await _context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -173,26 +179,26 @@ namespace PlayerPerformanceService.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<PlayerPerformance>> DeletePlayerPerformance(int id)
         {
-            var playerPerformance = await _context.PlayerPerformances.FindAsync(id);
+            var playerPerformance = await context.PlayerPerformances.FindAsync(id);
             if (playerPerformance == null)
             {
                 return NotFound();
             }
 
-            _context.PlayerPerformances.Remove(playerPerformance);
-            await _context.SaveChangesAsync();
+            context.PlayerPerformances.Remove(playerPerformance);
+            await context.SaveChangesAsync();
 
             return playerPerformance;
         }
 
         private bool PlayerPerformanceExists(int id)
         {
-            return _context.PlayerPerformances.Any(e => e.Id == id);
+            return context.PlayerPerformances.Any(e => e.Id == id);
         }
 
         private PlayerPerformance GetPlayerPerformanceFromLevel(int playerId, int levelId)
         {
-            return _context.PlayerPerformances
+            return context.PlayerPerformances
                 .Where(performance => performance.PlayerId == playerId && performance.LevelId == levelId)
                 .FirstOrDefault();
         }
