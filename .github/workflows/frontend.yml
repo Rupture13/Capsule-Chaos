@@ -33,10 +33,13 @@ jobs:
      
      
       - name: Set up Kustomize
+        working-directory: ./scoreboardfrontend2
         run: |-
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
+          
       - name: Deploy 
+        working-directory: ./scoreboardfrontend2
         run: |-
           ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:latest
           ./kustomize build . | kubectl apply -f -
