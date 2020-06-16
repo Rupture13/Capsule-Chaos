@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ScoreboardService.Models;
@@ -18,23 +19,27 @@ namespace ScoreboardService.Controllers
     {
         private const string _username = "guest";
         private const string _password = "guest";
-        private const string _hostname = "localhost";
         private const string _queueName = "ScoreboardQueue";
 
-        private readonly ScoreboardContext _context;
+        private readonly ScoreboardContext context;
         
         private ConnectionFactory factory;
         private IConnection conn;
         private IModel channel;
 
-        public HighscoresController(ScoreboardContext context)
+        private readonly IConfiguration configuration;
+
+        public HighscoresController(ScoreboardContext _context, IConfiguration _configuration)
         {
-            _context = context;
+            context = _context;
+            configuration = _configuration;
+
+            var RabbitMQOption = configuration.GetSection(RabbitMQOptions.Position).Get<RabbitMQOptions>();
 
             factory = new ConnectionFactory { 
                 UserName = _username,
                 Password = _password,
-                HostName = _hostname };
+                HostName = RabbitMQOption.Connection };
             conn = factory.CreateConnection();
             channel = conn.CreateModel();
 
@@ -90,14 +95,14 @@ namespace ScoreboardService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Highscore>>> GetHighscores()
         {
-            return await _context.Highscores.ToListAsync();
+            return await context.Highscores.ToListAsync();
         }
 
         // GET: api/Highscores/Level/1
         [HttpGet("Level/{levelId}")]
         public async Task<ActionResult<IEnumerable<Highscore>>> GetHighscoresOfLevel(int levelId)
         {
-            return await _context.Highscores.Where(highscore => highscore.LevelId == levelId).ToListAsync();
+            return await context.Highscores.Where(highscore => highscore.LevelId == levelId).ToListAsync();
         }
 
         // POST: api/Highscores
@@ -112,8 +117,8 @@ namespace ScoreboardService.Controllers
             {
                 //There is no previous highscore for this player in this level, creating one
 
-                _context.Highscores.Add(highscore);
-                await _context.SaveChangesAsync();
+                context.Highscores.Add(highscore);
+                await context.SaveChangesAsync();
 
                 return CreatedAtAction("GetHighscoresOfLevel", new { id = highscore.Id, levelId = highscore.LevelId }, highscore);       //201
             }
@@ -124,11 +129,11 @@ namespace ScoreboardService.Controllers
                 oldHighScore.FinishedTime = highscore.FinishedTime;
                 oldHighScore.CalculatedTotal = highscore.CalculatedTotal;
 
-                _context.Entry(oldHighScore).State = EntityState.Modified;
+                context.Entry(oldHighScore).State = EntityState.Modified;
 
                 try
                 {
-                    await _context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -156,26 +161,26 @@ namespace ScoreboardService.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Highscore>> DeleteHighscore(int id)
         {
-            var highscore = await _context.Highscores.FindAsync(id);
+            var highscore = await context.Highscores.FindAsync(id);
             if (highscore == null)
             {
                 return NotFound();
             }
 
-            _context.Highscores.Remove(highscore);
-            await _context.SaveChangesAsync();
+            context.Highscores.Remove(highscore);
+            await context.SaveChangesAsync();
 
             return highscore;
         }
 
         private bool HighscoreExists(int id)
         {
-            return _context.Highscores.Any(e => e.Id == id);
+            return context.Highscores.Any(e => e.Id == id);
         }
 
         private Highscore GetPlayerHighScoreForLevel(int playerId, int levelId)
         {
-            return _context.Highscores
+            return context.Highscores
                 .Where(highscore => highscore.PlayerId == playerId && highscore.LevelId == levelId)
                 .FirstOrDefault();
         }
