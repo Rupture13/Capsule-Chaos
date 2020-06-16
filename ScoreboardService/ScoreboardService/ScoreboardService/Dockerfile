@@ -6,7 +6,7 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["ScoreboardService/ScoreboardService.csproj", "ScoreboardService/"]
+COPY ["ScoreboardService/ScoreboardService.csproj", "./"]
 RUN dotnet restore "ScoreboardService/ScoreboardService.csproj"
 COPY . .
 WORKDIR "/src/ScoreboardService"
