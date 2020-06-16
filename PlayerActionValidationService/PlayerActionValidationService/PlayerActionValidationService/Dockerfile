@@ -6,7 +6,7 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["PlayerActionValidationService.csproj", "PlayerActionValidationService/"]
+COPY ["PlayerActionValidationService.csproj", "./"]
 RUN dotnet restore "PlayerActionValidationService.csproj"
 COPY . .
 WORKDIR "/src/"
