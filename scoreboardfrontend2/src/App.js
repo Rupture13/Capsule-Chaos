@@ -8,6 +8,13 @@ import Profile from "./components/Profile";
 import history from "./utils/history";
 import ExternalApi from "./utils/ExternalApi";
 import PrivateRoute from "./components/PrivateRoute";
+import { Layout } from 'antd';
+import "antd/dist/antd.css";
+import logo from "./Logo.png";
+import background from "./Background.jpg";
+import Home from "./components/Home";
+
+const { Header, Content } = Layout;
 
 function App() {
 	const { loading } = useAuth0();
@@ -20,14 +27,25 @@ function App() {
 		<div className="App">
 			{/* Don't forget to include the history module */}
 			<Router history={history}>
-				<header>
-					<NavBar />
-				</header>
-				<Switch>
-					<Route path="/" exact />
-					<PrivateRoute path="/profile" component={Profile} />
-					<PrivateRoute path="/scoreboard" component={ExternalApi} />
-				</Switch>
+				<Layout>
+					<Header style={{ backgroundColor: '#2191C9', textAlign: 'center', height: '10vh' }}>
+						<img src={logo} alt='Logo' style={{ height: '90%', marginTop: '0.25%' }} />
+					</Header>
+					<Layout style={{ height: '90vh' }}>
+						<Header style={{ backgroundColor: '#A6ACB5' }}>
+							<NavBar />
+						</Header>
+						<Content style={{ padding: '0 50px', backgroundImage: `url(${background})`, backgroundSize: 'cover' }}>
+							<div style={{ background: 'rgba(255,255,255,0.8)', padding: '24px', height: '83vh' }}>
+								<Switch>
+									<Route path="/" exact component={Home} />
+									<PrivateRoute path="/scoreboard" component={ExternalApi} />
+									<PrivateRoute path="/profile" component={Profile} />
+								</Switch>
+							</div>
+						</Content>
+					</Layout>
+				</Layout>
 			</Router>
 		</div>
 	);

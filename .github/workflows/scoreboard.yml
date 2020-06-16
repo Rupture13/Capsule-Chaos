@@ -1,0 +1,5 @@
+name: Deploy ScoreboardService
+on:
+  push:
+    branches:
+      - 'scoreboarddeploy'
