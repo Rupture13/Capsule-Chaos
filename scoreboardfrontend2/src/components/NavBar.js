@@ -22,7 +22,6 @@ const NavBar = () => {
 
 			{isAuthenticated && (
 				<>
-
 					<Menu
 						theme='dark'
 						mode="horizontal"
