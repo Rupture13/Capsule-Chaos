@@ -15,11 +15,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gke-capsulechaosfrontend
+  name: gke-capsulechaosgateway
 spec:
   ports:
-    - port: 80
-      targetPort: 3000
+    - port: 8080
+      targetPort: 8080
   selector:
-    app: capsulechaosfrontend
+    app: capsulechaosgateway
 type: NodePort
