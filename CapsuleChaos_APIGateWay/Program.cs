@@ -32,7 +32,7 @@ namespace APIGW
                         .SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
                         .AddJsonFile("appsettings.json", true, true)
                         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                        .AddJsonFile(Path.Combine("configuration", $"configuration_{hostingContext.HostingEnvironment.EnvironmentName}.json"), false, true)
+                        .AddJsonFile(Path.Combine("configuration", $"configuration__{hostingContext.HostingEnvironment.EnvironmentName}.json"), false, true)
                         .AddEnvironmentVariables();
                 })
                 .ConfigureLogging((hostingContext, logging) =>
