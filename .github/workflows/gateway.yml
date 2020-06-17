@@ -44,7 +44,7 @@ jobs:
           chmod u+x ./kustomize
           
       - name: Deploy 
-        working-directory: ./PlayerPerformanceService/PlayerPerformanceService/PlayerPerformanceService
+        working-directory: ./CapsuleChaos_APIGateWay
         run: |-
           ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosgateway=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosgateway:$GITHUB_SHA
           ./kustomize build . | kubectl apply -f -
