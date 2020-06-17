@@ -19,6 +19,7 @@ namespace ScoreboardService.Controllers
     {
         private const string _username = "guest";
         private const string _password = "guest";
+		private const string _vhost = "testvhost";
         private const string _queueName = "ScoreboardQueue";
 
         private readonly ScoreboardContext context;
@@ -39,6 +40,7 @@ namespace ScoreboardService.Controllers
             factory = new ConnectionFactory { 
                 UserName = _username,
                 Password = _password,
+				VirtualHost = _vhost,
                 HostName = RabbitMQOption.Connection };
             conn = factory.CreateConnection();
             channel = conn.CreateModel();
