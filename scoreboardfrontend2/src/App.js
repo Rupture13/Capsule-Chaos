@@ -6,7 +6,7 @@ import { useAuth0 } from "./react-auth0-spa";
 import { Router, Route, Switch } from "react-router-dom";
 import Profile from "./components/Profile";
 import history from "./utils/history";
-import ExternalApi from "./utils/ExternalApi";
+import Scoreboard from "./components/Scoreboard";
 import PrivateRoute from "./components/PrivateRoute";
 import { Layout } from 'antd';
 import "antd/dist/antd.css";
@@ -39,7 +39,7 @@ function App() {
 							<div style={{ background: 'rgba(255,255,255,0.8)', padding: '24px', height: '83vh' }}>
 								<Switch>
 									<Route path="/" exact component={Home} />
-									<PrivateRoute path="/scoreboard" component={ExternalApi} />
+									<PrivateRoute path="/scoreboard" component={Scoreboard} />
 									<PrivateRoute path="/profile" component={Profile} />
 								</Switch>
 							</div>

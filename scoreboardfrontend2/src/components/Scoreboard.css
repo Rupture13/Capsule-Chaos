@@ -1,0 +1,27 @@
+.ant-table-wrapper *, .ant-table-body * {
+    background-color: #ffffff0a;
+}
+
+.ant-table-wrapper div[style*="bolder"] {
+	background-color: #00000000 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+	border-color: #c1c1c152;
+}
+
+.ant-table-thead > tr > th {
+    background-color: #2191C9;
+}
+
+.ant-table-container table > thead > tr:first-child th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.ant-table-container table > thead > tr:first-child th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.ant-input-number-input {
+	text-align: center;
+}

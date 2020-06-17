@@ -8,14 +8,43 @@ import { Form, Input, Button, Modal } from 'antd';
 import { UserOutlined, WarningFilled } from '@ant-design/icons';
 
 const Profile = () => {
-	const { loading, user } = useAuth0();
+	const { loading, user, getIdTokenClaims } = useAuth0();
+
+	const callUpdateApi = async (newUsername) => {
+		try {
+			//Get token
+			const token = await getIdTokenClaims();
+
+			console.log('dubmbm ' + newUsername);
+			console.log(user.accountId);
+			user.accountId = 1;
+
+			//Send request with token
+			const response = await fetch(`http://localhost:5010/api/accountingplus/accounts/${user.accountId}`, {
+				method: 'PUT',
+				headers: { Authorization: `Bearer ${token.__raw}`, 'Content-Type': 'application/json' },
+				body: JSON.stringify({ accountId: 1, email: user.email, username: newUsername })
+			});
+
+			let responseData = await response.status;
+			if (responseData === 204) {
+				alert(`Username successfully changed to ${newUsername}.`);
+			}
+			else {
+				alert("Request could not be completed at this time. Please try again later.");
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	if (loading || !user) {
 		return <div>Loading...</div>;
 	}
 
-	const onFinish = values => {
-		console.log('Success:', values);
+	const onFinish = newUsername => {
+		console.log('Success:', newUsername);
+		callUpdateApi(newUsername);
 	};
 
 	const onFinishFailed = errorInfo => {
@@ -53,7 +82,7 @@ const Profile = () => {
 				<Form
 					name="basic"
 					initialValues={{ remember: true }}
-					onFinish={onFinish}
+					onFinish={(values) => { onFinish(values.username) }}
 					onFinishFailed={onFinishFailed}
 					layout='vertical'
 				>

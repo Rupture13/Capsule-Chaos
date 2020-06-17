@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - 'frontenddeploy'
+      
+# Environment variables available to all jobs and steps in this workflow
+env:
+  GITHUB_SHA: ${{ github.sha }}
 
 jobs:
   deploy:
@@ -14,7 +18,7 @@ jobs:
 
       - name: Build Docker image
         run: |-
-          docker build --tag "eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:latest" ./scoreboardfrontend2
+          docker build --tag "eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:$GITHUB_SHA" ./scoreboardfrontend2
       - name: Authenticate into Google Cloud Platform
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
@@ -29,7 +33,7 @@ jobs:
             gcloud container clusters  get-credentials ${{ secrets.GCLOUD_CLUSTER }} --zone ${{ secrets.GCLOUD_ZONE }}
             
       - name: Push image to Google Cloud Container Registry
-        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:latest"
+        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:$GITHUB_SHA"
      
      
       - name: Set up Kustomize
@@ -41,7 +45,7 @@ jobs:
       - name: Deploy 
         working-directory: ./scoreboardfrontend2
         run: |-
-          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:latest
+          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosfrontend:$GITHUB_SHA
           ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/capsulechaosfrontend
           kubectl get services -o wide

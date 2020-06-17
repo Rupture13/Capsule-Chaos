@@ -1,7 +1,7 @@
 ﻿{
   "Routes": [
     {
-      //RollingGames-AccountService
+      //RollingGames-AccountService GET/POST
       "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -11,11 +11,24 @@
         }
       ],
       "UpstreamPathTemplate": "/api/accounting/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "GET", "DELETE" ]
-      //      "AuthenticationOptions": {
-      //        "AuthenticationProviderKey": "TestKey",
-      //        "AllowedScopes": [ "adviceAPI" ]
-      //      }
+      "UpstreamHttpMethod": [ "POST", "GET" ]
+    },
+    {
+      //RollingGames-AccountService PUT/DELETE
+      "DownstreamPathTemplate": "/api/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "UpstreamPathTemplate": "/api/accountingplus/{everything}",
+      "UpstreamHttpMethod": [ "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0Key_CapsuleChaos",
+        "AllowedScopes": []
+      }
     },
     {
       //PlayerActionValidationService
@@ -29,10 +42,6 @@
       ],
       "UpstreamPathTemplate": "/api/validation/{everything}",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET", "DELETE" ]
-      //      "AuthenticationOptions": {
-      //        "AuthenticationProviderKey": "Auth0Key_CapsuleChaos",
-      //        "AllowedScopes": [ "adviceAPI" ]
-      //      }
     },
     {
       //ScoreboardService POST/PUT/DELETE
@@ -46,10 +55,6 @@
       ],
       "UpstreamPathTemplate": "/api/highscores/{everything}",
       "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ]
-      //      "AuthenticationOptions": {
-      //        "AuthenticationProviderKey": "TestKey",
-      //        "AllowedScopes": [ "adviceAPI" ]
-      //      }
     },
     {
       //ScoreboardService GET
@@ -80,10 +85,6 @@
       ],
       "UpstreamPathTemplate": "/api/ghost/{everything}",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET", "DELETE" ]
-      //      "AuthenticationOptions": {
-      //        "AuthenticationProviderKey": "TestKey",
-      //        "AllowedScopes": [ "adviceAPI" ]
-      //      }
     }
   ],
   "GlobalConfiguration": {
