@@ -20,6 +20,7 @@ namespace PlayerPerformanceService.Controllers
     {
         private const string _username = "guest";
         private const string _password = "guest";
+		private const string _vhost = "testvhost";
         private const string _queueName = "GhostQueue";
 
         private readonly PlayerPerformanceContext context;
@@ -41,6 +42,7 @@ namespace PlayerPerformanceService.Controllers
             {
                 UserName = _username,
                 Password = _password,
+				VirtualHost = _vhost,
                 HostName = RabbitMQOption.Connection
             };
             conn = factory.CreateConnection();
