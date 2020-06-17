@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: gke-capsulechaosingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api/*
+        backend:
+          serviceName: gke-capsulechaosgateway
+          servicePort: 8080
+      - path: /*
+        backend:
+          serviceName: gke-capsulechaosfrontend
+          servicePort: 8080

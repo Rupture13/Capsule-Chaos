@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmqservice
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: rabbitmqservice
+  template:
+    metadata:
+      labels:
+        app: rabbitmqservice
+    spec:
+      containers:
+      - name: rabbitmqservice
+        image: rabbitmqservice:3-management
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 100m
