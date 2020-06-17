@@ -2,15 +2,14 @@
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["ScoreboardService/ScoreboardService.csproj", "ScoreboardService/"]
-RUN dotnet restore "ScoreboardService/ScoreboardService.csproj"
+COPY ["ScoreboardService.csproj", "./"]
+RUN dotnet restore "ScoreboardService.csproj"
 COPY . .
-WORKDIR "/src/ScoreboardService"
+WORKDIR "/src/"
 RUN dotnet build "ScoreboardService.csproj" -c Release -o /app/build
 
 FROM build AS publish
@@ -18,5 +17,8 @@ RUN dotnet publish "ScoreboardService.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+
+ENV ASPNETCORE_URLS=http://+:8080/
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "ScoreboardService.dll"]

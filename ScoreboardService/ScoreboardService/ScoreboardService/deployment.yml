@@ -1,0 +1,26 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: capsulechaosscoreboardservice
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: capsulechaosscoreboardservice
+    spec:
+      containers:
+      - name: capsulechaosscoreboardservice
+        image: eu.gcr.io/capsulechaos/capsulechaosscoreboardservice
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 100m              

@@ -1,9 +1,13 @@
-name: Deploy ScoreboardService
+name: Deploy PlayerPerformanceService
 
 on:
   push:
     branches:
-      - 'scoreboarddeploy'
+      - 'ghostdeploy'
+      
+# Environment variables available to all jobs and steps in this workflow
+env:
+  GITHUB_SHA: ${{ github.sha }}
       
 jobs:
   deploy:
@@ -15,7 +19,7 @@ jobs:
 
       - name: Build Docker image
         run: |-
-          docker build --tag "eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosscoreboardservice:latest" ./ScoreboardService/ScoreboardService/ScoreboardService
+          docker build --tag "eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosghostservice:$GITHUB_SHA" ./PlayerPerformanceService/PlayerPerformanceService/PlayerPerformanceService
       - name: Authenticate into Google Cloud Platform
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
@@ -30,19 +34,19 @@ jobs:
             gcloud container clusters  get-credentials ${{ secrets.GCLOUD_CLUSTER }} --zone ${{ secrets.GCLOUD_ZONE }}
             
       - name: Push image to Google Cloud Container Registry
-        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosscoreboardservice:latest"
+        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosghostservice:$GITHUB_SHA"
      
      
       - name: Set up Kustomize
-        working-directory: ./ScoreboardService/ScoreboardService/ScoreboardService
+        working-directory: ./PlayerPerformanceService/PlayerPerformanceService/PlayerPerformanceService
         run: |-
           curl -sfLo kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.1.0/kustomize_3.1.0_linux_amd64
           chmod u+x ./kustomize
           
       - name: Deploy 
-        working-directory: ./ScoreboardService/ScoreboardService/ScoreboardService
+        working-directory: ./PlayerPerformanceService/PlayerPerformanceService/PlayerPerformanceService
         run: |-
-          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosscoreboardservice=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosscoreboardservice:latest
+          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosghostservice=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaosghostservice:$GITHUB_SHA
           ./kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment/capsulechaosscoreboardservice
+          kubectl rollout status deployment/capsulechaosghostservice
           kubectl get services -o wide
