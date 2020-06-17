@@ -22,4 +22,4 @@ spec:
       targetPort: 8080
   selector:
     app: capsulechaosgateway
-type: NodePort
+  type: NodePort

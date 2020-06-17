@@ -22,4 +22,4 @@ spec:
       targetPort: 3000
   selector:
     app: capsulechaosfrontend
-type: NodePort
+  type: NodePort
