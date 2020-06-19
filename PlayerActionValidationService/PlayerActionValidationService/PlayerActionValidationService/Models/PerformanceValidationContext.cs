@@ -8,23 +8,32 @@ namespace PlayerActionValidationService.Models
 {
     public class PerformanceValidationContext : DbContext
     {
+        static int count = 0;
+
         public PerformanceValidationContext(DbContextOptions<PerformanceValidationContext> options)
             : base(options)
         {
-            SeedContextOnStartup();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            Console.WriteLine("[DEBUG] I got to this point");
+            // The container name
+            modelBuilder.HasDefaultContainer("PerformanceValidations");
         }
 
         public virtual DbSet<PerformanceValidation> PerformanceValidations { get; set; }
 
-        private void SeedContextOnStartup()
+        private async void SeedContextOnStartup(int counter)
         {
-            if (this.PerformanceValidations.Find(1) != null)
+            if (counter > 0)
             {
                 return;
             }
 
             var newPerformanceValidation1 = new PerformanceValidation
             {
+                Id = new System.Guid(),
                 LevelId = 1,
                 MaximumScore = 10,
                 MinimumTime = 2000
@@ -32,15 +41,16 @@ namespace PlayerActionValidationService.Models
 
             var newPerformanceValidation2 = new PerformanceValidation
             {
+                Id = new System.Guid(),
                 LevelId = 2,
                 MaximumScore = 12,
                 MinimumTime = 4500
             };
 
-            this.PerformanceValidations.Add(newPerformanceValidation1);
-            this.PerformanceValidations.Add(newPerformanceValidation2);
+            await this.PerformanceValidations.AddAsync(newPerformanceValidation1);
+            await this.PerformanceValidations.AddAsync(newPerformanceValidation2);
 
-            this.SaveChanges();
+            await this.SaveChangesAsync();
         }
     }
 }

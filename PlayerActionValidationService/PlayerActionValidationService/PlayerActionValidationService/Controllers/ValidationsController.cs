@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlayerActionValidationService.Models;
+using PlayerActionValidationService.Services;
 
 namespace PlayerActionValidationService.Controllers
 {
@@ -13,11 +14,17 @@ namespace PlayerActionValidationService.Controllers
     [ApiController]
     public class ValidationsController : ControllerBase
     {
-        private readonly PerformanceValidationContext _context;
+        private readonly ICosmosDbService service;
 
-        public ValidationsController(PerformanceValidationContext context)
+        public ValidationsController(ICosmosDbService service)
         {
-            _context = context;
+            this.service = service;
+        }
+
+        [HttpGet("Query")]
+        public async Task<ActionResult<IEnumerable<PerformanceValidation>>> GetValidations()
+        {
+            return Ok(await service.GetItemsAsync());
         }
 
         // POST: api/validate
@@ -26,12 +33,13 @@ namespace PlayerActionValidationService.Controllers
         [HttpPost]
         public async Task<ActionResult> PostPerformanceValidation(PerformanceValidation performance)
         {
-            if (!PerformanceValidationExists(performance.LevelId))
+            bool validationForLevelExists = await service.PerformanceValidationExists(performance.LevelId);
+            if (!validationForLevelExists)
             {
                 return NotFound();
             }
 
-            var validation = await _context.PerformanceValidations.FirstOrDefaultAsync(p => p.LevelId == performance.LevelId);
+            var validation = await service.GetItemAsync(performance.LevelId);
 
             if (PerformanceMatchesValidation(performance, validation))
             {
@@ -43,9 +51,28 @@ namespace PlayerActionValidationService.Controllers
             }
         }
 
-        private bool PerformanceValidationExists(int levelId)
+        // DELETE: api/validate/add
+        [HttpPost("Add")]
+        public async Task<ActionResult<PerformanceValidation>> AddPerformanceValidation(PerformanceValidation performance)
         {
-            return _context.PerformanceValidations.Any(e => e.LevelId == levelId);
+            await service.AddItemAsync(performance);
+
+            return CreatedAtAction("GetAdvice", new { id = performance.Id }, performance);
+        }
+
+        // DELETE: api/validate/delete/5
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult<PerformanceValidation>> DeleteValidation(int id)
+        {
+            var advice = await service.GetItemAsync(id);
+            if (advice == null)
+            {
+                return NotFound();
+            }
+
+            await service.DeleteItemAsync(id);
+
+            return advice;
         }
 
         private bool PerformanceMatchesValidation(PerformanceValidation performance, PerformanceValidation validation)

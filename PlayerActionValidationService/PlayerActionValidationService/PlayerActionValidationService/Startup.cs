@@ -7,18 +7,19 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using PlayerActionValidationService.Models;
+using PlayerActionValidationService.Services;
 
 namespace PlayerActionValidationService
 {
     public class Startup
     {
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
         public Startup(IConfiguration configuration)
         {
@@ -40,24 +41,25 @@ namespace PlayerActionValidationService
                 });
             });
 
-            services.AddCors(options =>
+            //CosmosDB NoSQL
+            // add this line to make sure that controllers can 
+            // suppress the naming convention policy
+            services.AddControllers().AddJsonOptions(options => {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            });
+            // register the DbContext class in DI Container
+            services.AddDbContext<PerformanceValidationContext>(options =>
             {
-                options.AddPolicy(MyAllowSpecificOrigins,
-                builder =>
-                {
-                    //TODO: specify allowed origin for security:
-                    //builder.WithOrigins("http://example.com")
-                    //                    .AllowAnyHeader()
-                    //                    .AllowAnyMethod();
-
-                    builder.AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                });
+                options.UseCosmos(Configuration["CosmosDbSettings:EndPoint"].ToString(),
+                  Configuration["CosmosDbSettings:AccountKey"].ToString(),
+                   Configuration["CosmosDbSettings:DatabaseName"].ToString(), opt => opt.ConnectionMode(Microsoft.Azure.Cosmos.ConnectionMode.Gateway));
             });
 
-            services.AddDbContext<PerformanceValidationContext>(opt =>
-               opt.UseInMemoryDatabase("PerformanceValidationList"));
+            services.AddScoped<ICosmosDbService, CosmosDbService>();
+
+            //InMemoryDatabase
+            //services.AddDbContext<PerformanceValidationContext>(opt =>
+            //   opt.UseInMemoryDatabase("PerformanceValidationList"));
 
             services.AddControllers();
         }
@@ -75,7 +77,6 @@ namespace PlayerActionValidationService
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "PlayerActionValidationService API v1");
             });
 
-            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseHttpsRedirection();
 
