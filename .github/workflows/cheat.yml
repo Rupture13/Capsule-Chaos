@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - 'cheatdeploy'
-      
+
+# Environment variables available to all jobs and steps in this workflow
+env:
+  GITHUB_SHA: ${{ github.sha }}
+
 jobs:
   deploy:
     name: Deploy job
@@ -20,7 +24,7 @@ jobs:
 
       - name: Build Docker image
         run: |-
-          docker build --tag "eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice:latest" ./PlayerActionValidationService/PlayerActionValidationService/PlayerActionValidationService
+          docker build --tag "eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice:$GITHUB_SHA" ./PlayerActionValidationService/PlayerActionValidationService/PlayerActionValidationService
       
       
       - name: Authenticate into Google Cloud Platform
@@ -37,7 +41,7 @@ jobs:
             gcloud container clusters  get-credentials ${{ secrets.GCLOUD_CLUSTER }} --zone ${{ secrets.GCLOUD_ZONE }}
             
       - name: Push image to Google Cloud Container Registry
-        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice:latest"
+        run: "docker push eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice:$GITHUB_SHA"
      
      
       - name: Set up Kustomize
@@ -49,7 +53,7 @@ jobs:
       - name: Deploy 
         working-directory: ./PlayerActionValidationService/PlayerActionValidationService/PlayerActionValidationService
         run: |-
-          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice:latest
+          ./kustomize edit set image eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice=eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice:$GITHUB_SHA
           ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/capsulechaoscheatservice
           kubectl get services -o wide
