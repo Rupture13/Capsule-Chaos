@@ -15,6 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        projectPath:
+          - CapsuleChaos_UnityGame
         unityVersion:
           - 2019.3.3f1
         testMode:
@@ -24,36 +26,37 @@ jobs:
     steps:
       # Checkout
       - name: Checkout repository
-        working-directory: ./CapsuleChaos_UnityGame
         uses: actions/checkout@v2
         with:
           lfs: true
     
       # Cache
       - uses: actions/cache@v1.1.0
-        working-directory: ./CapsuleChaos_UnityGame
         with:
-          path: Library
-          key: Library
+          path: ${{ matrix.projectPath }}/Library
+          key: Library-${{ matrix.projectPath }}-${{ matrix.targetPlatform }}
+          restore-keys: |
+            Library-${{ matrix.projectPath }}-
+            Library-
 
       # Test
       - name: Run tests
-        working-directory: ./CapsuleChaos_UnityGame
         uses: webbertakken/unity-test-runner@v1.3
+        id: testRunner
         with:
+          projectPath: ${{ matrix.projectPath }}
           unityVersion: ${{ matrix.unityVersion }}
           
       # Build
       - name: Build project
-        working-directory: ./CapsuleChaos_UnityGame
         uses: webbertakken/unity-builder@v0.10
         with:
+          projectPath: ${{ matrix.projectPath }}
           unityVersion: ${{ matrix.unityVersion }}
           targetPlatform: ${{ matrix.targetPlatform }}
 
       # Output 
       - uses: actions/upload-artifact@v1
-        working-directory: ./CapsuleChaos_UnityGame
         with:
           name: Build
           path: build
