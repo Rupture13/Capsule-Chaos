@@ -31,11 +31,12 @@ jobs:
       # Cache
       - uses: actions/cache@v1.1.0
         with:
-          path: Library
+          path: CapsuleChaos_UnityGame/Library
           key: Library
 
       # Test
       - name: Run tests
+        #working-directory: ./CapsuleChaos_UnityGame
         uses: webbertakken/unity-test-runner@v1.3
         with:
           unityVersion: ${{ matrix.unityVersion }}
