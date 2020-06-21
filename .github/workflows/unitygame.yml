@@ -16,6 +16,7 @@ jobs:
   build:
     name: Test and build Capsule-Chaos
     runs-on: ubuntu-latest
+    working-directory: CapsuleChaos_UnityGame
     strategy:
       fail-fast: false
       matrix:
