@@ -12,10 +12,17 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v1
+        
+      - name: Build dotnet project
+        run: |-
+          dotnet build ./PlayerActionValidationService/PlayerActionValidationService/PlayerActionValidationService.sln --configuration Release
+          dotnet test ./PlayerActionValidationService/PlayerActionValidationService/PlayerActionValidationService.sln --configuration Release
 
       - name: Build Docker image
         run: |-
           docker build --tag "eu.gcr.io/${{ secrets.GCLOUD_PROJECT }}/capsulechaoscheatservice:latest" ./PlayerActionValidationService/PlayerActionValidationService/PlayerActionValidationService
+      
+      
       - name: Authenticate into Google Cloud Platform
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
