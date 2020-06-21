@@ -13,7 +13,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v1
         
-      - name: Build dotnet project
+      - name: Test project via Unit Tests
         run: |-
           dotnet build ./PlayerActionValidationService/PlayerActionValidationService/PlayerActionValidationService.sln --configuration Release
           dotnet test ./PlayerActionValidationService/PlayerActionValidationService/PlayerActionValidationService.sln --configuration Release
