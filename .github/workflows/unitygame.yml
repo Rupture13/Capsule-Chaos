@@ -1,4 +1,4 @@
-name: Unity Game Build
+name: Unity Game Test and Build
 
 on:
   push:
