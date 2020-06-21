@@ -7,6 +7,10 @@ on:
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  
+defaults:
+  run:
+    working-directory: CapsuleChaos_UnityGame
 
 jobs:
   build:
@@ -31,12 +35,11 @@ jobs:
       # Cache
       - uses: actions/cache@v1.1.0
         with:
-          path: CapsuleChaos_UnityGame/Library
+          path: Library
           key: Library
 
       # Test
       - name: Run tests
-        #working-directory: ./CapsuleChaos_UnityGame
         uses: webbertakken/unity-test-runner@v1.3
         with:
           unityVersion: ${{ matrix.unityVersion }}
