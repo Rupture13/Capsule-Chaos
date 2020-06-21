@@ -48,7 +48,7 @@ namespace PlayerActionValidationService.Controllers
             return _context.PerformanceValidations.Any(e => e.LevelId == levelId);
         }
 
-        private bool PerformanceMatchesValidation(PerformanceValidation performance, PerformanceValidation validation)
+        public static bool PerformanceMatchesValidation(PerformanceValidation performance, PerformanceValidation validation)
         {
             return (performance.LevelId == validation.LevelId 
                 && performance.MaximumScore == validation.MaximumScore 
