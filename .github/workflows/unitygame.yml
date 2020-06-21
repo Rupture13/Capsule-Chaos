@@ -7,16 +7,11 @@ on:
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-  
-defaults:
-  run:
-    working-directory: CapsuleChaos_UnityGame
 
 jobs:
   build:
     name: Test and build Capsule-Chaos
     runs-on: ubuntu-latest
-    working-directory: CapsuleChaos_UnityGame
     strategy:
       fail-fast: false
       matrix:
@@ -29,24 +24,28 @@ jobs:
     steps:
       # Checkout
       - name: Checkout repository
+        working-directory: ./CapsuleChaos_UnityGame
         uses: actions/checkout@v2
         with:
           lfs: true
     
       # Cache
       - uses: actions/cache@v1.1.0
+        working-directory: ./CapsuleChaos_UnityGame
         with:
           path: Library
           key: Library
 
       # Test
       - name: Run tests
+        working-directory: ./CapsuleChaos_UnityGame
         uses: webbertakken/unity-test-runner@v1.3
         with:
           unityVersion: ${{ matrix.unityVersion }}
           
       # Build
       - name: Build project
+        working-directory: ./CapsuleChaos_UnityGame
         uses: webbertakken/unity-builder@v0.10
         with:
           unityVersion: ${{ matrix.unityVersion }}
@@ -54,6 +53,7 @@ jobs:
 
       # Output 
       - uses: actions/upload-artifact@v1
+        working-directory: ./CapsuleChaos_UnityGame
         with:
           name: Build
           path: build
