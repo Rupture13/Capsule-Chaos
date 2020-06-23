@@ -6,28 +6,27 @@ import "antd/dist/antd.css";
 import { Divider, Row, Col, Form, Input, Button, Modal, Spin, Tooltip, Typography } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { UserOutlined, WarningFilled } from '@ant-design/icons';
-import { CapsuleChaosUser } from "../Models";
+import { CapsuleChaosUser, EmailProvider } from "../Models";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 48 }} spin />;
 const { Text } = Typography;
 
 const Profile = () => {
-	const { loading, user, getIdTokenClaims, logout } = useAuth0();
 	const [actualLoading, setActualLoading] = useState(true);
 	const [actualUser, setActualUser] = useState(new CapsuleChaosUser());
 
 	const callGetUserApi = async () => {
-		if (loading || !actualLoading) {
+		if (!actualLoading) {
 			return;
 		}
 
 		try {
-			//Get token
-			//const token = await getIdTokenClaims();
+			//Get email
+			let emailprov = new EmailProvider();
 
 			//Send request with token
 			let response;
-			response = await fetch(`http://localhost:5010/api/accounting/accounts/Find/${user.email}`, {
+			response = await fetch(`http://localhost:5010/api/accounting/accounts/Find/${emailprov.email}`, {
 				method: 'GET'
 			});
 
@@ -42,15 +41,13 @@ const Profile = () => {
 	const callUpdateApi = async (newUsername) => {
 
 		try {
-			//Get token
-			const token = await getIdTokenClaims();
 
 			console.log(`[API] Updating username '${actualUser.username}' to '${newUsername}'.`);
 
 			//Send request with token
-			const response = await fetch(`http://localhost:5010/api/accountingplus/accounts/${actualUser.accountId}`, {
+			const response = await fetch(`http://localhost:5010/api/accounting/accounts/${actualUser.accountId}`, {
 				method: 'PUT',
-				headers: { Authorization: `Bearer ${token.__raw}`, 'Content-Type': 'application/json' },
+				headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': 'http://localhost:3000', 'Access-Control-Allow-Credentials': 'true' },
 				body: JSON.stringify({ accountId: actualUser.accountId, email: actualUser.email, username: newUsername })
 			});
 
@@ -69,21 +66,18 @@ const Profile = () => {
 
 	const callDeleteApi = async () => {
 		try {
-			//Get token
-			const token = await getIdTokenClaims();
 
 			console.log(`[API] Deleting user with ID ${actualUser.accountId}`);
 
 			//Send request with token
-			const response = await fetch(`http://localhost:5010/api/accountingplus/accounts/${actualUser.accountId}`, {
-				method: 'DELETE',
-				headers: { Authorization: `Bearer ${token.__raw}` }
+			const response = await fetch(`http://localhost:5010/api/accounting/accounts/${actualUser.accountId}`, {
+				method: 'DELETE'
 			});
 
 			let responseData = await response.status;
 			if (responseData === 200) {
 				alert(`User account successfully deleted.`);
-				logout();
+				window.location.href = 'https://www.google.com';
 			}
 			else {
 				alert("Request could not be completed at this time. Please try again later.");
@@ -93,7 +87,7 @@ const Profile = () => {
 		}
 	};
 
-	if (loading || actualLoading || !user) {
+	if (actualLoading) {
 		callGetUserApi();
 		return <div style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bolder' }}>
 			<Spin size='large' indicator={antIcon} tip="Loading user data..." style={{ marginTop: '100px' }} />

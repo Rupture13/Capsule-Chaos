@@ -22,3 +22,11 @@ export class Highscore {
 	playerId;
 	playername;
 }
+
+export class EmailProvider {
+	constructor() {
+		this.email = "taiga456123@gmail.com";
+	}
+
+	email;
+}

@@ -1,34 +1,19 @@
-// src/App.js
-
 import React from "react";
 import NavBar from "./components/NavBar";
-import { useAuth0 } from "./react-auth0-spa";
 import { Router, Route, Switch } from "react-router-dom";
 import Profile from "./components/Profile";
 import history from "./utils/history";
 import Scoreboard from "./components/Scoreboard";
-import PrivateRoute from "./components/PrivateRoute";
-import { Layout, Spin } from 'antd';
+import { Layout } from 'antd';
 import "antd/dist/antd.css";
 import logo from "./Logo.png";
 import background from "./Background.jpg";
 import Home from "./components/Home";
-import { LoadingOutlined } from '@ant-design/icons';
 
-const antIcon = <LoadingOutlined style={{ fontSize: 100, color: '#FFA203' }} spin />;
 
 const { Header, Content } = Layout;
 
-function App() {
-	const { loading } = useAuth0();
-
-	if (loading) {
-		return <div style={{ textAlign: 'center', fontSize: '32px', fontWeight: 'bolder' }}>
-			<img src={logo} alt='Logo' style={{ width: '300px', marginTop: '150px' }} />
-			<br />
-			<Spin size='large' indicator={antIcon} tip="Loading web page..." style={{ marginTop: '150px', color: 'grey' }} />
-		</div>;;
-	}
+const App = () => {
 
 	return (
 		<div className="App">
@@ -46,8 +31,8 @@ function App() {
 							<div style={{ background: 'rgba(255,255,255,0.8)', padding: '24px', height: '83vh' }}>
 								<Switch>
 									<Route path="/" exact component={Home} />
-									<PrivateRoute path="/scoreboard" component={Scoreboard} />
-									<PrivateRoute path="/profile" component={Profile} />
+									<Route path="/scoreboard" component={Scoreboard} />
+									<Route path="/profile" component={Profile} />
 								</Switch>
 							</div>
 						</Content>

@@ -14,17 +14,13 @@ const Scoreboard = () => {
 	const [levelId, setLevelId] = useState(1);
 	const [showResult, setShowResult] = useState(false);
 	const [apiMessage, setApiMessage] = useState();
-	const { getIdTokenClaims } = useAuth0();
 
 	const callApi = async (searchLevelId) => {
 		try {
 			console.log(`Now searching for highscores of level ${searchLevelId}`)
-			//Get token
-			const token = await getIdTokenClaims();
 
 			//Send request with token
 			const response = await fetch(`http://localhost:5010/api/scoreboard/highscores/level/${searchLevelId}`, {
-				headers: { Authorization: `Bearer ${token.__raw}` }
 			});
 
 			//Fetch data in correct class format

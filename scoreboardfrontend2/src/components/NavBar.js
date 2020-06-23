@@ -6,14 +6,14 @@ import { Link } from "react-router-dom";
 import { Menu, Button } from "antd";
 import "antd/dist/antd.css";
 
-const NavBar = () => {
-	const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+const NavBar = (isAuthenticated, logout) => {
+
 
 	return (
 		<div>
 			{!isAuthenticated && (
 				<Button
-					onClick={() => loginWithRedirect({})} type='primary'
+					type='primary'
 					style={{ fontWeight: 'bolder', float: 'right', transform: 'translateY(50%)' }}
 				>
 					Log in
@@ -33,7 +33,7 @@ const NavBar = () => {
 						<Menu.Item key="3"><Link style={{ fontWeight: 'bold' }} to="/profile">Profile</Link></Menu.Item>
 						<Button
 							style={{ backgroundColor: 'rgba(255,230,230,0.5)', color: 'red', fontWeight: 'bolder', float: 'right', transform: 'translateY(50%)' }}
-							danger onClick={() => logout()}
+							danger onClick={() => { window.location.href = 'https://www.google.com'; }}
 						>
 							Log out
 						</Button>

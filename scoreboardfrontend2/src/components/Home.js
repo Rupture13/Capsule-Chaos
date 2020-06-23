@@ -1,30 +1,29 @@
 import React, { useState } from "react";
 import { useAuth0 } from "../react-auth0-spa";
 import { Link } from "react-router-dom";
-import { Button, Divider, Col, Row, Spin } from "antd";
+import { Divider, Col, Row, Spin } from "antd";
 import "antd/dist/antd.css";
 import { BarChartOutlined, UserOutlined, LoadingOutlined } from '@ant-design/icons';
-import { CapsuleChaosUser } from "../Models";
+import { CapsuleChaosUser, EmailProvider } from "../Models";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 48 }} spin />;
 
 const Home = () => {
-	const { isAuthenticated, loginWithRedirect, loading, user } = useAuth0();
 	const [actualLoading, setActualLoading] = useState(true);
 	const [actualUser, setActualUser] = useState(new CapsuleChaosUser());
 
 	const callGetUserApi = async () => {
-		if (loading || !actualLoading) {
+		if (!actualLoading) {
 			return;
 		}
 
 		try {
-			//Get token
-			//const token = await getIdTokenClaims();
+			//Get email
+			let emailprov = new EmailProvider();
 
 			//Send request with token
 			let response;
-			response = await fetch(`http://localhost:5010/api/accounting/accounts/Find/${user.email}`, {
+			response = await fetch(`http://localhost:5010/api/accounting/accounts/Find/${emailprov.email}`, {
 				method: 'GET'
 			});
 
@@ -36,7 +35,7 @@ const Home = () => {
 		}
 	};
 
-	if (isAuthenticated && actualLoading) {
+	if (actualLoading) {
 		callGetUserApi();
 		return <div style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bolder' }}>
 			<Spin size='large' indicator={antIcon} tip="Loading user data..." style={{ marginTop: '100px' }} />
@@ -45,23 +44,7 @@ const Home = () => {
 
 	return (
 		<div>
-			{!isAuthenticated && (
-				<div style={{ textAlign: 'center' }}>
-					<br /><br />
-					<h1 style={{ fontSize: '48px', color: '#2191C9' }}>Welcome to Capsule Chaos!</h1>
-					<h2 style={{ fontSize: '36px', color: '#A6ACB5' }}>Please log in</h2>
-					<br /><br /><br /><br /><br />
-
-					<Button
-						type='primary' style={{ width: '15vw', height: '9vh', fontSize: '32px', fontWeight: 'bolder' }}
-						onClick={() => loginWithRedirect({})}
-					>
-						Log in
-					</Button>
-				</div>
-			)}
-
-			{isAuthenticated && (
+			{true && (
 				<div style={{ textAlign: 'center' }}>
 					<br /><br />
 					<h1 style={{ fontSize: '48px', color: '#2191C9' }}>Welcome, {actualUser.username}!</h1>

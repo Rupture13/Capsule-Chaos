@@ -3,6 +3,7 @@ name: Deploy PlayerPerformanceService
 on:
   push:
     branches:
+      - 'master'
       - 'ghostdeploy'
       
 # Environment variables available to all jobs and steps in this workflow
