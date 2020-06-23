@@ -43,7 +43,7 @@ public class MainMenuManager : MonoBehaviour
         //Point camera to level select when coming out of a level and being logged in
         if (playerInfo.Player.accountId != -1)
         {
-            Debug.Log("Player already logged in!");
+            //Debug.Log("Player already logged in!");
             mainMenuCamera.Play("MainMenuCameraInstantLevelSelect");
             alreadyLoggedIn.Invoke();
         }
@@ -87,7 +87,7 @@ public class MainMenuManager : MonoBehaviour
 
     private void OnRetrieveGhostDataFail(string failReason)
     {
-        Debug.Log($"[GhostDataRetrieve Fail] Reason: {failReason}.");
+        //Debug.Log($"[GhostDataRetrieve Fail] Reason: {failReason}.");
         ghostsRetrieveFail.Invoke();
     }
 
@@ -136,7 +136,7 @@ public class MainMenuManager : MonoBehaviour
             {
                 byte[] result = req.downloadHandler.data;
                 string performancesJson = System.Text.Encoding.Default.GetString(result);
-                Debug.Log(performancesJson);
+                //Debug.Log(performancesJson);
                 ghostData = JsonArrayUtility.FromJson<PlayerPerformance>(performancesJson);
                 if (ghostData.Count == 0)
                 {

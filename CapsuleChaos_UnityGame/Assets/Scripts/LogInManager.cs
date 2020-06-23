@@ -66,7 +66,7 @@ public class LogInManager : MonoBehaviour
     {
         isWaiting = false;
 
-        Debug.LogError(error);
+        //Debug.LogError(error);
         loginButtonText.SetActive(true);
         loadingIcon.SetActive(false);
         inputUsername.GetComponent<Image>().color = wrongColour;

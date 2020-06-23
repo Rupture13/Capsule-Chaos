@@ -12,7 +12,7 @@ public class APICaller : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            Debug.Log("API Call sent.");
+            //Debug.Log("API Call sent.");
             //StartCoroutine(GetRequest("https://localhost:" + port + "/weatherforecast"));
             StartCoroutine(PostRequest("https://localhost:" + port + "/weatherforecast", "hello there"));
         }
@@ -30,7 +30,7 @@ public class APICaller : MonoBehaviour
 
             if (webRequest.isNetworkError)
             {
-                Debug.Log(pages[page] + ": Error: " + webRequest.error);
+                //Debug.Log(pages[page] + ": Error: " + webRequest.error);
 
                 
             }
@@ -40,7 +40,7 @@ public class APICaller : MonoBehaviour
                 
                 byte[] result = webRequest.downloadHandler.data;
                 string weatherJSON = System.Text.Encoding.Default.GetString(result);
-                Debug.Log(weatherJSON);
+                //Debug.Log(weatherJSON);
             }
         }
     }
@@ -63,7 +63,7 @@ public class APICaller : MonoBehaviour
 
             if (webRequest.isNetworkError)
             {
-                Debug.Log(pages[page] + ": Error: " + webRequest.error);
+                //Debug.Log(pages[page] + ": Error: " + webRequest.error);
             }
             else
             {
@@ -71,7 +71,7 @@ public class APICaller : MonoBehaviour
 
                 byte[] result = webRequest.downloadHandler.data;
                 string weatherJSON = System.Text.Encoding.Default.GetString(result);
-                Debug.Log(weatherJSON);
+                //Debug.Log(weatherJSON);
             }
         }
     }

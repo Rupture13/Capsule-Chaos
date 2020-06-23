@@ -14,8 +14,8 @@ public class LevelEndManager : MonoBehaviour
     [SerializeField]
     private PlayerScore playerScore = default;
 
-    [SerializeField]
-    private string APIGWbaseUrl = "http://localhost";
+    //[SerializeField]
+    //private string APIGWbaseUrl = "http://localhost";
     //[SerializeField]
     //private int APIGWport = 5010;
 
@@ -43,10 +43,6 @@ public class LevelEndManager : MonoBehaviour
 
     private IEnumerator SaveScoreToBackend()
     {
-        //TODO delete
-        string ghostJson2 = JsonUtility.ToJson(ghostInfo.PlayerPerformance);
-        //Debug.Log(ghostJson2);
-
         bool hasFailed = false;
         string successMessage = "Score saved successfully!";
 
@@ -60,6 +56,7 @@ public class LevelEndManager : MonoBehaviour
 
             yield return req.SendWebRequest();
             while (!req.isDone) { yield return null; }
+            
             if (req.isNetworkError)
             {
                 onFail.Invoke("Score could not be saved due to a connection issue");
@@ -82,7 +79,6 @@ public class LevelEndManager : MonoBehaviour
         // Stop if cheating detected or the request failed in some other way
         if (hasFailed) { yield break; }
 
-
         // -------------- Step 2: Post score --------------
         bool newHighscore = false;
 
@@ -95,7 +91,7 @@ public class LevelEndManager : MonoBehaviour
             playerScore.GetTimeInteger()
             ));
 
-        using (UnityWebRequest req2 = UnityWebRequest.Post($"{APIGWbaseUrl}/api/scoreboard/highscores", ""))
+        using (UnityWebRequest req2 = UnityWebRequest.Post("http://34.120.48.192/api/scoreboard/highscores", ""))
         {
             req2.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(highscoreJson));
             req2.SetRequestHeader("Content-Type", "application/json");
@@ -118,7 +114,7 @@ public class LevelEndManager : MonoBehaviour
             }
             else
             { 
-                onFail.Invoke($"Score could not be saved due to an unknown error ({req2.responseCode})");
+                onFail.Invoke($"Score could not be saved due to an unknown error (2:{req2.responseCode})");
                 hasFailed = true;
             }
         }
@@ -136,7 +132,7 @@ public class LevelEndManager : MonoBehaviour
         // -------------- Step 3.B: Post new ghost data on new highscore --------------
         string ghostJson = JsonUtility.ToJson(ghostInfo.PlayerPerformance);
 
-        using (UnityWebRequest req3 = UnityWebRequest.Post($"{APIGWbaseUrl}/api/ghost/playerperformances", ""))
+        using (UnityWebRequest req3 = UnityWebRequest.Post("http://34.120.48.192/api/ghost/playerperformances", ""))
         {
             req3.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(ghostJson));
             req3.SetRequestHeader("Content-Type", "application/json");
@@ -154,7 +150,7 @@ public class LevelEndManager : MonoBehaviour
             }
             else
             {
-                onFail.Invoke($"Score could not be saved due to an unknown error ({req3.responseCode})");
+                onFail.Invoke($"Score could not be saved due to an unknown error (3:{req3.responseCode})");
                 hasFailed = true;
             }
         }
