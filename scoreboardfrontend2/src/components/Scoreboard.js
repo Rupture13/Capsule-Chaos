@@ -6,6 +6,7 @@ import { Spin, Row, Col, Table, InputNumber } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import Column from "antd/lib/table/Column";
 import "../components/Scoreboard.css"
+import { Highscore } from "../Models";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 48 }} spin />;
 
@@ -130,17 +131,3 @@ const Scoreboard = () => {
 	);
 };
 export default Scoreboard;
-
-class Highscore {
-	constructor(obj) {
-		obj && Object.assign(this, obj);
-	}
-
-	calculatedTotal;
-	collectedScore;
-	finishedTime;
-	id;
-	levelId;
-	playerId;
-	playername;
-}

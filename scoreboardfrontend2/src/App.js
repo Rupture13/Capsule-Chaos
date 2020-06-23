@@ -8,11 +8,14 @@ import Profile from "./components/Profile";
 import history from "./utils/history";
 import Scoreboard from "./components/Scoreboard";
 import PrivateRoute from "./components/PrivateRoute";
-import { Layout } from 'antd';
+import { Layout, Spin } from 'antd';
 import "antd/dist/antd.css";
 import logo from "./Logo.png";
 import background from "./Background.jpg";
 import Home from "./components/Home";
+import { LoadingOutlined } from '@ant-design/icons';
+
+const antIcon = <LoadingOutlined style={{ fontSize: 100, color: '#FFA203' }} spin />;
 
 const { Header, Content } = Layout;
 
@@ -20,7 +23,11 @@ function App() {
 	const { loading } = useAuth0();
 
 	if (loading) {
-		return <div>Loading...</div>;
+		return <div style={{ textAlign: 'center', fontSize: '32px', fontWeight: 'bolder' }}>
+			<img src={logo} alt='Logo' style={{ width: '300px', marginTop: '150px' }} />
+			<br />
+			<Spin size='large' indicator={antIcon} tip="Loading web page..." style={{ marginTop: '150px', color: 'grey' }} />
+		</div>;;
 	}
 
 	return (
