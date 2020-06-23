@@ -1,7 +1,4 @@
-// src/views/ExternalApi.js
-
 import React, { useState } from "react";
-import { useAuth0 } from "../react-auth0-spa";
 import { Spin, Row, Col, Table, InputNumber } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import Column from "antd/lib/table/Column";
@@ -20,7 +17,7 @@ const Scoreboard = () => {
 			console.log(`Now searching for highscores of level ${searchLevelId}`)
 
 			//Send request with token
-			const response = await fetch(`http://localhost:5010/api/scoreboard/highscores/level/${searchLevelId}`, {
+			const response = await fetch(`${window.location.origin}/api/scoreboard/highscores/level/${searchLevelId}`, {
 			});
 
 			//Fetch data in correct class format

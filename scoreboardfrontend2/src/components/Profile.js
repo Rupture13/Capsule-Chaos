@@ -1,7 +1,4 @@
-// src/components/Profile.js
-
 import React, { useState } from "react";
-import { useAuth0 } from "../react-auth0-spa";
 import "antd/dist/antd.css";
 import { Divider, Row, Col, Form, Input, Button, Modal, Spin, Tooltip, Typography } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
@@ -26,7 +23,7 @@ const Profile = () => {
 
 			//Send request with token
 			let response;
-			response = await fetch(`http://localhost:5010/api/accounting/accounts/Find/${emailprov.email}`, {
+			response = await fetch(`${window.location.origin}/api/accounting/accounts/Find/${emailprov.email}`, {
 				method: 'GET'
 			});
 
@@ -45,7 +42,7 @@ const Profile = () => {
 			console.log(`[API] Updating username '${actualUser.username}' to '${newUsername}'.`);
 
 			//Send request with token
-			const response = await fetch(`http://localhost:5010/api/accounting/accounts/${actualUser.accountId}`, {
+			const response = await fetch(`${window.location.origin}/api/accounting/accounts/${actualUser.accountId}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': 'http://localhost:3000', 'Access-Control-Allow-Credentials': 'true' },
 				body: JSON.stringify({ accountId: actualUser.accountId, email: actualUser.email, username: newUsername })
@@ -70,7 +67,7 @@ const Profile = () => {
 			console.log(`[API] Deleting user with ID ${actualUser.accountId}`);
 
 			//Send request with token
-			const response = await fetch(`http://localhost:5010/api/accounting/accounts/${actualUser.accountId}`, {
+			const response = await fetch(`${window.location.origin}/api/accounting/accounts/${actualUser.accountId}`, {
 				method: 'DELETE'
 			});
 

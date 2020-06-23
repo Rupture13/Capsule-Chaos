@@ -2,7 +2,7 @@ name: Deploy ScoreboardService
 on:
   push:
     branches:
-      - 'master'
+#      - 'master'
       - 'scoreboarddeploy'
 
 # Environment variables available to all jobs and steps in this workflow

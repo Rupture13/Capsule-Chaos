@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useAuth0 } from "../react-auth0-spa";
 import { Link } from "react-router-dom";
 import { Divider, Col, Row, Spin } from "antd";
 import "antd/dist/antd.css";
@@ -23,7 +22,7 @@ const Home = () => {
 
 			//Send request with token
 			let response;
-			response = await fetch(`http://localhost:5010/api/accounting/accounts/Find/${emailprov.email}`, {
+			response = await fetch(`${window.location.origin}/api/accounting/accounts/Find/${emailprov.email}`, {
 				method: 'GET'
 			});
 
