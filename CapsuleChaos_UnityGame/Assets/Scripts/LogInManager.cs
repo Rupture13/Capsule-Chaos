@@ -9,8 +9,8 @@ public class LogInManager : MonoBehaviour
 {
     [SerializeField]
     private string APIGWbaseUrl = "http://localhost";
-    [SerializeField]
-    private int APIGWport = 5010;
+    //[SerializeField]
+    //private int APIGWport = 5010;
 
     [SerializeField]
     private PlayerInfo playerInfo = default;
@@ -75,7 +75,7 @@ public class LogInManager : MonoBehaviour
 
     IEnumerator SendLoginWebRequest(string username, string password, System.Action<PlayerInformation> onSuccess, System.Action<string> onFail)
     {
-        using (UnityWebRequest req = UnityWebRequest.Get($"{APIGWbaseUrl}:{APIGWport}/api/accounting/Accounts/Login?username={username}&password={password}"))
+        using (UnityWebRequest req = UnityWebRequest.Get($"{APIGWbaseUrl}/api/accounting/Accounts/Login?username={username}&password={password}"))
         {
             yield return req.SendWebRequest();
             while (!req.isDone) { yield return null; }

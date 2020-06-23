@@ -10,8 +10,8 @@ public class MainMenuManager : MonoBehaviour
 {
     [SerializeField]
     private string APIGWbaseUrl = "http://localhost";
-    [SerializeField]
-    private int APIGWport = 5010;
+    //[SerializeField]
+    //private int APIGWport = 5010;
 
     [SerializeField]
     private PlayerInfo playerInfo = default;
@@ -120,7 +120,7 @@ public class MainMenuManager : MonoBehaviour
 
     IEnumerator GetGhostDataWebRequest(int levelId, System.Action onSuccess, System.Action<string> onFail)
     {
-        using (UnityWebRequest req = UnityWebRequest.Get($"{APIGWbaseUrl}:{APIGWport}/api/ghost/PlayerPerformances/{levelId}"))
+        using (UnityWebRequest req = UnityWebRequest.Get($"{APIGWbaseUrl}/api/ghost/PlayerPerformances/{levelId}"))
         {
             yield return req.SendWebRequest();
             while (!req.isDone) { yield return null; }

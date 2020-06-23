@@ -16,8 +16,8 @@ public class LevelEndManager : MonoBehaviour
 
     [SerializeField]
     private string APIGWbaseUrl = "http://localhost";
-    [SerializeField]
-    private int APIGWport = 5010;
+    //[SerializeField]
+    //private int APIGWport = 5010;
 
     [SerializeField]
     private PlayerInfo playerInfo = default;
@@ -53,7 +53,7 @@ public class LevelEndManager : MonoBehaviour
         // -------------- Step 1: Check cheating --------------
         string validationJson = JsonUtility.ToJson(new ValidationData(levelInfo.LevelId, playerScore.score, playerScore.GetTimeInteger()));
 
-        using (UnityWebRequest req = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/validation/validate", ""))
+        using (UnityWebRequest req = UnityWebRequest.Post("https://europe-west1-capsulechaos.cloudfunctions.net/capsulechaosplayeractionvalidationfunction", ""))
         {
             req.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(validationJson));
             req.SetRequestHeader("Content-Type", "application/json");
@@ -95,7 +95,7 @@ public class LevelEndManager : MonoBehaviour
             playerScore.GetTimeInteger()
             ));
 
-        using (UnityWebRequest req2 = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/highscores/highscores", ""))
+        using (UnityWebRequest req2 = UnityWebRequest.Post($"{APIGWbaseUrl}/api/scoreboard/highscores", ""))
         {
             req2.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(highscoreJson));
             req2.SetRequestHeader("Content-Type", "application/json");
@@ -136,7 +136,7 @@ public class LevelEndManager : MonoBehaviour
         // -------------- Step 3.B: Post new ghost data on new highscore --------------
         string ghostJson = JsonUtility.ToJson(ghostInfo.PlayerPerformance);
 
-        using (UnityWebRequest req3 = UnityWebRequest.Post($"{APIGWbaseUrl}:{APIGWport}/api/ghost/playerperformances", ""))
+        using (UnityWebRequest req3 = UnityWebRequest.Post($"{APIGWbaseUrl}/api/ghost/playerperformances", ""))
         {
             req3.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(ghostJson));
             req3.SetRequestHeader("Content-Type", "application/json");
@@ -168,15 +168,15 @@ public class LevelEndManager : MonoBehaviour
     [System.Serializable]
     private class ValidationData
     {
-        public int levelId;
-        public int maximumScore;
-        public int minimumTime;
+        public int LevelId;
+        public int MaximumScore;
+        public int MinimumTime;
 
         public ValidationData(int levelId, int maximumScore, int minimumTime)
         {
-            this.levelId = levelId;
-            this.maximumScore = maximumScore;
-            this.minimumTime = minimumTime;
+            this.LevelId = levelId;
+            this.MaximumScore = maximumScore;
+            this.MinimumTime = minimumTime;
         }
     }
 

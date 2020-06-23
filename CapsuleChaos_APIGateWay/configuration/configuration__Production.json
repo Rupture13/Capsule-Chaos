@@ -3,7 +3,7 @@
     {
       //RollingGames-AccountService
       "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "gke-capsulechaosaccountservice",
@@ -11,29 +11,29 @@
         }
       ],
       "UpstreamPathTemplate": "/api/accounting/{everything}",
-      "UpstreamHttpMethod": [ "POST", "GET" ]
+      "UpstreamHttpMethod": [ "POST", "PUT", "GET", "DELETE" ]
     },
-    {
-      //RollingGames-AccountService PUT/DELETE
-      "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "gke-capsulechaosaccountservice",
-          "Port": 8080
-        }
-      ],
-      "UpstreamPathTemplate": "/api/accountingplus/{everything}",
-      "UpstreamHttpMethod": [ "PUT", "DELETE" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Auth0Key_CapsuleChaos",
-        "AllowedScopes": []
-      }
-    },
+    //{
+    //  //RollingGames-AccountService PUT/DELETE
+    //  "DownstreamPathTemplate": "/api/{everything}",
+    //  "DownstreamScheme": "http",
+    //  "DownstreamHostAndPorts": [
+    //    {
+    //      "Host": "gke-capsulechaosaccountservice",
+    //      "Port": 8080
+    //    }
+    //  ],
+    //  "UpstreamPathTemplate": "/api/accountingplus/{everything}",
+    //  "UpstreamHttpMethod": [ "PUT", "DELETE" ],
+    //  "AuthenticationOptions": {
+    //    "AuthenticationProviderKey": "Auth0Key_CapsuleChaos",
+    //    "AllowedScopes": []
+    //  }
+    //},
     {
       //PlayerActionValidationService
       "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "gke-capsulechaoscheatservice",
@@ -53,33 +53,33 @@
           "Port": 8080
         }
       ],
-      "UpstreamPathTemplate": "/api/highscores/{everything}",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ]
+      "UpstreamPathTemplate": "/api/scoreboard/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "GET", "DELETE" ]
     },
+    //{
+    //  //ScoreboardService GET
+    //  "DownstreamPathTemplate": "/api/{everything}",
+    //  "DownstreamScheme": "http",
+    //  "DownstreamHostAndPorts": [
+    //    {
+    //      "Host": "gke-capsulechaosscoreboardservice",
+    //      "Port": 8080
+    //    }
+    //  ],
+    //  "UpstreamPathTemplate": "/api/scoreboard/{everything}",
+    //  "UpstreamHttpMethod": [ "GET" ],
+    //  "AuthenticationOptions": {
+    //    "AuthenticationProviderKey": "Auth0Key_CapsuleChaos",
+    //    "AllowedScopes": []
+    //  }
+    //},
     {
-      //ScoreboardService GET
+      //PlayerPerformanceService
       "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "gke-capsulechaosscoreboardservice",
-          "Port": 8080
-        }
-      ],
-      "UpstreamPathTemplate": "/api/scoreboard/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Auth0Key_CapsuleChaos",
-        "AllowedScopes": []
-      }
-    },
-    {
-      //PlayerPerformanceService
-      "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "capsulechaosghostservice",
+          "Host": "gke-capsulechaosghostservice",
           "Port": 8080
         }
       ],
